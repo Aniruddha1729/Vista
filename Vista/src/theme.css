@@ -1,0 +1,114 @@
+:root {
+  color-scheme: light;
+  --vista-bg: #f7f8f2;
+  --vista-surface: #ffffff;
+  --vista-surface-soft: #f5f6f1;
+  --vista-text: #11130f;
+  --vista-muted: #71756b;
+  --vista-border: rgba(17,19,15,.14);
+  --vista-accent: #a9d82f;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --vista-bg: #11140f;
+  --vista-surface: #1b2019;
+  --vista-surface-soft: #232920;
+  --vista-text: #f0f2e9;
+  --vista-muted: #b3b9aa;
+  --vista-border: rgba(240,242,233,.16);
+  --vista-accent: #c8f246;
+}
+body[data-theme='dark'] { background: var(--vista-bg); color: var(--vista-text); }
+[data-theme='dark'] :is(.app-shell,.hero-section,.events-page,.collection-page,.host-event-page,.public-event-page,.registration-page,.auth-page,.scanner-page,.ticket-page,.invite-acceptance-page,.expired-link-page,.profile-page,.settings-page,.public-event-shell,.collection-layout,.events-page-layout,.host-event-layout,.registration-shell,.settings-layout) { background-color: var(--vista-bg) !important; color: var(--vista-text); }
+[data-theme='dark'] .home-category-tile { background: var(--vista-surface); color: var(--vista-text); }
+[data-theme='dark'] .home-category-tile:hover { background: #2a351b; }
+[data-theme='dark'] .home-category-icon { color: #b8df56; }
+[data-theme='dark'] .event-time-badge { background: rgba(27,32,25,.94); border-color: var(--vista-border); color: var(--vista-text); }
+[data-theme='dark'] .event-time-badge.passed { background: rgba(8,10,8,.9); color: #fff; }
+[data-theme='dark'] :is(.events-show-more,.collection-remove-saved) { border-color: var(--vista-border); color: var(--vista-text); }
+[data-theme='dark'] .home-category-tile > span,
+[data-theme='dark'] .home-step-grid p,
+[data-theme='dark'] .home-stats span { color: var(--vista-muted); }
+[data-theme='dark'] .home-how { background: var(--vista-surface); }
+[data-theme='dark'] .home-step-grid article,
+[data-theme='dark'] .home-stats,
+[data-theme='dark'] .home-stats div { border-color: var(--vista-border); }
+[data-theme='dark'] .home-final-cta { background: #c8f246; color: #11140f; }
+[data-theme='dark'] :is(.auth-card,.event-card,.collection-event-card,.notification-card,.notification-empty,.profile-photo-card,.profile-form,.settings-card,.ticket-card,.invite-acceptance-card,.registration-success,.public-register-card,.workspace-panel,.event-editor-form,.invite-panel,.invite-row,.invite-template-choice,.share-link-box,.profile-menu,.public-section,.registration-section,.registration-form,.sidebar-style-option) { background-color: var(--vista-surface) !important; color: var(--vista-text); }
+[data-theme='dark'] .profile-menu a,
+[data-theme='dark'] .profile-menu button { color: var(--vista-text) !important; }
+[data-theme='dark'] .profile-menu a:hover,
+[data-theme='dark'] .profile-menu button:hover { background: var(--vista-surface-soft); }
+[data-theme='dark'] .registration-success { background: #27351b; color: var(--vista-text); }
+[data-theme='dark'] .team-request-status-list { background: var(--vista-surface-soft); }
+[data-theme='dark'] .team-request-status-list > div { border-color: var(--vista-border); }
+[data-theme='dark'] .team-invite-error { background: #442923; color: #ffd0c5 !important; }
+[data-theme='dark'] .team-invite-message { background: #303b22; color: #d9f6a2 !important; }
+[data-theme='dark'] :is(.event-card,.notification-card,.notification-empty,.auth-card,.profile-photo-card,.profile-form,.settings-card,.ticket-card,.invite-acceptance-card,.registration-success,.public-register-card,.workspace-panel,.event-editor-form,.invite-panel,.invite-row,.invite-template-choice,.share-link-box,.profile-menu,.public-section,.registration-section,.registration-form,.sidebar-style-option,.profile-field input,.profile-field textarea,.issue-report-form input,.issue-report-form textarea) { border-color: var(--vista-border) !important; }
+[data-theme='dark'] :is(p,li,label,.event-card-content h3,.public-event-summary h1,.public-event-facts p,.public-section h2,.public-section p,.collection-intro p,.host-event-topbar h1,.event-editor-heading h2,.workspace-panel-heading h2,.profile-section h2,.settings-card h2,.invite-panel-heading h2,.scanner-main h1,.ticket-card h1,.auth-card h1,.registration-heading h1,.invite-acceptance-card h1,.expired-link-page h1,.profile-photo-card h2,.workspace-table-row,.invite-person strong,.event-form-field,.registration-form label,.profile-field,.issue-report-form label) { color: var(--vista-text) !important; }
+[data-theme='dark'] :is(small,.collection-summary,.free-tier,.profile-menu-name,.profile-photo-card p,.settings-card p,.sidebar-style-option small,.event-card p,.public-event-organiser,.registration-heading p,.scanner-main > p,.ticket-card p,.invite-acceptance-card p,.profile-section p,.workspace-panel-count) { color: var(--vista-muted) !important; }
+[data-theme='dark'] :is(input,select,textarea,.events-page-search,.events-search,.workspace-search,.invite-search,.share-link-box,.auth-form input,.profile-field input,.profile-field textarea,.issue-report-form input,.issue-report-form textarea,.registration-form input,.registration-form select,.registration-form textarea,.event-form-field input,.event-form-field select,.event-form-field textarea,.events-page-filters button,.host-event-tabs button,.host-event-tabs) { background-color: var(--vista-surface-soft); border-color: var(--vista-border); color: var(--vista-text); }
+[data-theme='dark'] :is(.events-page-count,.events-page-empty,.collection-action,.host-event-public,.event-form-submit,.registration-submit,.auth-submit,.profile-save,.settings-submit,.public-register-button,.invite-acceptance-card > a,.ticket-download,.settings-secondary-button) { color: var(--vista-text); }
+[data-theme='dark'] :is(.section-eyebrow,.event-card-category,.public-event-mode,.public-event-tags span,h1 em,.site-footer em) { color: #b8df56 !important; }
+[data-theme='dark'] :is(.event-form-saved,.profile-saved,.settings-saved) { background: #33451c; color: #dafb9c !important; }
+[data-theme='dark'] :is(.auth-error,.profile-error,.settings-error,.invite-error,.scanner-result-error,.scanner-camera-error) { background: #442923; color: #ffd0c5 !important; }
+[data-theme='dark'] .profile-mark { background: #c8f246; color: #10130d; }
+[data-theme='dark'] .public-event-back { background: var(--vista-surface); border-color: var(--vista-border); color: var(--vista-text); }
+[data-theme='dark'] .public-event-back span { background: #303b22; color: #d9f6a2; }
+[data-theme='dark'] .public-event-back:hover { background: var(--vista-surface-soft); color: var(--vista-text); }
+[data-theme='dark'] .host-event-save { background: #c8f246; color: #11140f; }
+[data-theme='dark'] .vista-sidebar { background: #080a08; }
+[data-theme='dark'] .footer-links a,.footer-links a:hover { color: #fff; }
+[data-theme='dark'] .event-card-meta,.data-table,.public-event-facts,.registration-section,.profile-section,.collection-summary,.host-event-tabs { border-color: var(--vista-border); }
+[data-theme='dark'] .applicant-type { color: #14200a !important; }
+[data-theme='dark'] .scanner-result-success { background: #27391b; color: #edffd4; }
+[data-theme='dark'] .scanner-result-success h2,.scanner-result-success p { color: #edffd4; }
+
+.vista-sidebar.vista-sidebar-dock,
+.vista-sidebar.vista-sidebar-dock:hover,
+.vista-sidebar.vista-sidebar-dock:focus-within {
+  align-items: center;
+  background: rgba(15,18,13,.95);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 19px;
+  bottom: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.28);
+  color: #fff;
+  display: flex;
+  flex: none;
+  flex-direction: row;
+  gap: 6px;
+  height: 64px;
+  left: 50%;
+  overflow: visible;
+  padding: 8px 10px;
+  position: fixed;
+  top: auto;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, calc(100% + 20px));
+  transition: opacity .2s ease, transform .24s cubic-bezier(.2,.75,.25,1);
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  align-self: auto;
+  z-index: 1000;
+}
+.vista-sidebar.vista-sidebar-dock.vista-sidebar-dock-visible,
+.vista-sidebar.vista-sidebar-dock:focus-within { opacity: 1; pointer-events: auto; transform: translateX(-50%); }
+body.vista-sidebar-dock-mode :is(.public-event-sidebar,.registration-sidebar,.events-page-sidebar,.collection-sidebar,.host-event-sidebar,.settings-sidebar,.plans-sidebar,.profile-sidebar,.scanner-sidebar,.ticket-sidebar,.invite-acceptance-sidebar,.team-invite-sidebar,.auth-page-sidebar,.expired-link-sidebar) { flex: 0 0 0 !important; min-width: 0; overflow: visible; width: 0 !important; }
+.vista-sidebar.vista-sidebar-dock .vista-dock-icon { align-items: center; background: linear-gradient(145deg, #34313c, #24212b); border: 1px solid rgba(255,255,255,.13); border-radius: 13px; box-shadow: 0 4px 9px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08); color: rgba(255,255,255,.92); display: flex; flex: 0 0 54px; gap: 0; height: 54px; justify-content: center; min-height: 54px; padding: 0; position: relative; transition: background .15s ease, color .15s ease, transform .16s ease; width: 54px; }
+.vista-sidebar-dock .vista-sidebar-icon { font-size: 21px; }
+.vista-sidebar-dock .vista-sidebar-text { display: none; }
+.vista-sidebar.vista-sidebar-dock .vista-dock-icon:hover,
+.vista-sidebar.vista-sidebar-dock .vista-dock-icon:focus-visible { background: linear-gradient(145deg, #484552, #302d38); color: #c8f246; outline: 0; transform: translateY(-9px) scale(1.08); }
+.vista-sidebar.vista-sidebar-dock .vista-dock-icon.active { background: #c8f246; border-color: rgba(200,242,70,.8); color: #11140f; }
+.vista-sidebar.vista-sidebar-dock .vista-dock-icon::after { background: #17151b; border: 1px solid rgba(255,255,255,.14); border-radius: 7px; bottom: calc(100% + 9px); color: #fff; content: attr(data-tooltip); font-size: 10px; left: 50%; opacity: 0; padding: 6px 8px; pointer-events: none; position: absolute; transform: translate(-50%,4px); transition: opacity .12s ease, transform .12s ease; white-space: nowrap; }
+.vista-sidebar.vista-sidebar-dock .vista-dock-icon:hover::after,
+.vista-sidebar.vista-sidebar-dock .vista-dock-icon:focus-visible::after { opacity: 1; transform: translate(-50%,0); }
+@media (max-width: 560px) { .vista-sidebar.vista-sidebar-dock { bottom: 10px; gap: 3px; height: 58px; max-width: calc(100vw - 18px); padding: 5px; } .vista-sidebar.vista-sidebar-dock .vista-dock-icon { flex-basis: 44px; height: 44px; min-height: 44px; width: 44px; } }
+@media (hover: none) { .vista-sidebar.vista-sidebar-dock { opacity: 1; pointer-events: auto; transform: translateX(-50%); } }
+@media (max-width: 850px) {
+  body:not(.vista-sidebar-dock-mode) :is(.public-event-sidebar,.registration-sidebar,.events-page-sidebar,.collection-sidebar,.host-event-sidebar,.settings-sidebar,.plans-sidebar,.profile-sidebar,.scanner-sidebar,.ticket-sidebar,.invite-acceptance-sidebar,.team-invite-sidebar,.auth-page-sidebar,.expired-link-sidebar):not(:empty) { display: block !important; flex: 0 0 64px !important; width: 64px !important; }
+  body.vista-sidebar-dock-mode :is(.public-event-sidebar,.registration-sidebar,.events-page-sidebar,.collection-sidebar,.host-event-sidebar,.settings-sidebar,.plans-sidebar,.profile-sidebar,.scanner-sidebar,.ticket-sidebar,.invite-acceptance-sidebar,.team-invite-sidebar,.auth-page-sidebar,.expired-link-sidebar):not(:empty) { display: block !important; flex: 0 0 0 !important; width: 0 !important; }
+}

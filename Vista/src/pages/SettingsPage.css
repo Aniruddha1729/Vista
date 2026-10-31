@@ -1,0 +1,29 @@
+.settings-layout { display: flex; min-height: calc(100vh - 78px); }
+.settings-sidebar { flex: 0 0 64px; }
+.settings-sidebar .vista-sidebar { min-height: calc(100vh - 78px); }
+.settings-main { flex: 1; margin: 0 auto; max-width: 1080px; padding: 56px 32px 100px; width: 100%; }
+.settings-main > header h1 { font-size: clamp(42px,6vw,66px); letter-spacing: -.07em; margin: 10px 0 36px; }
+.settings-card { background: #fff; border-radius: 18px; margin-bottom: 22px; padding: 26px; }
+.settings-card-heading { align-items: end; display: flex; justify-content: space-between; }
+.settings-card h2 { font-size: 23px; letter-spacing: -.04em; margin: 7px 0 8px; }
+.settings-card p { color: #6b6f63; font-size: 13px; margin: 0; }
+.settings-current { color: #66704e; font-size: 12px; }
+.sidebar-style-options { display: grid; gap: 14px; grid-template-columns: repeat(2,minmax(0,1fr)); margin-top: 22px; }
+.sidebar-style-option { background: #fafbf8; border: 1px solid rgba(12,13,11,.14); border-radius: 13px; color: #0c0d0b; cursor: pointer; display: grid; gap: 8px; padding: 16px; text-align: left; }
+.sidebar-style-option.selected { border-color: #78a81d; box-shadow: 0 0 0 2px rgba(120,168,29,.16); }
+.sidebar-style-option strong { font-size: 13px; }
+.sidebar-style-option small { color: #6b6f63; font-size: 11px; }
+.sidebar-preview { align-items: center; background: #151812; border-radius: 10px; color: #fff; display: flex; gap: 10px; height: 82px; justify-content: center; padding: 12px; }
+.sidebar-preview i { align-items: center; background: rgba(255,255,255,.12); border-radius: 9px; display: inline-flex; font-style: normal; height: 38px; justify-content: center; width: 38px; }
+.sidebar-preview-hover { justify-content: flex-start; }
+.sidebar-preview-hover i:first-child { background: #c8f246; color: #111; }
+.sidebar-preview-dock i:hover { transform: scale(1.22); }
+.theme-setting-card { align-items: center; display: flex; justify-content: space-between; }
+.settings-secondary-button { background: transparent; border: 1px solid rgba(12,13,11,.2); border-radius: 9px; cursor: pointer; font: inherit; font-size: 12px; padding: 12px 15px; }
+.issue-report-form { display: grid; gap: 16px; margin-top: 20px; max-width: 680px; }
+.issue-report-form label { display: grid; font-size: 12px; gap: 7px; }
+.issue-report-form input, .issue-report-form textarea { background: #fafbf8; border: 1px solid rgba(12,13,11,.15); border-radius: 9px; font: inherit; font-size: 13px; padding: 12px; }
+.issue-report-form textarea { resize: vertical; }
+.settings-submit { justify-self: start; margin-top: 2px; }
+@media (max-width: 800px) { .settings-sidebar { display: none; } }
+@media (max-width: 600px) { .settings-main { padding: 36px 16px 70px; } .sidebar-style-options { grid-template-columns: 1fr; } .settings-card-heading, .theme-setting-card { align-items: flex-start; flex-direction: column; gap: 18px; } }

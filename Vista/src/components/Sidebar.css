@@ -1,0 +1,122 @@
+.vista-sidebar {
+  background: #0c0d0b;
+  border-radius: 0 20px 20px 0;
+  bottom: 20px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  overflow: hidden;
+  padding: 22px 10px;
+  position: sticky;
+  top: 20px;
+  transition: width .25s ease, box-shadow .25s ease;
+  width: 64px;
+  z-index: 5;
+}
+
+.vista-sidebar:hover,
+.vista-sidebar:focus-within {
+  box-shadow: 12px 0 30px rgba(12, 13, 11, .16);
+  width: 240px;
+}
+
+.vista-sidebar-logo {
+  align-items: center;
+  color: #fff;
+  display: flex;
+  gap: 12px;
+  height: 38px;
+  padding: 0 10px;
+}
+
+.vista-sidebar-logo > span {
+  align-items: center;
+  background: #c8f246;
+  border-radius: 50%;
+  color: #0c0d0b;
+  display: inline-flex;
+  flex: 0 0 34px;
+  font-family: Georgia, serif;
+  font-size: 19px;
+  font-style: italic;
+  height: 34px;
+  justify-content: center;
+}
+
+.vista-sidebar-logo strong {
+  font-size: 19px;
+  letter-spacing: -.06em;
+}
+
+.vista-sidebar-section {
+  margin-top: 54px;
+}
+
+.vista-sidebar-section + .vista-sidebar-section {
+  margin-top: 30px;
+}
+
+.vista-sidebar-heading {
+  color: rgba(255, 255, 255, .42);
+  display: block;
+  font-size: 10px;
+  letter-spacing: .09em;
+  margin: 0 12px 10px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.vista-sidebar-links {
+  display: grid;
+  gap: 4px;
+}
+
+.vista-sidebar-link {
+  align-items: center;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, .68);
+  display: flex;
+  gap: 14px;
+  min-height: 42px;
+  padding: 0 12px;
+  white-space: nowrap;
+  position: relative;
+}
+.sidebar-notification-dot { background: #ed3b43; border: 2px solid #151813; border-radius: 50%; box-shadow: 0 0 0 2px rgba(237,59,67,.18); height: 9px; position: absolute; right: 8px; top: 8px; width: 9px; }
+.vista-sidebar-link.active .sidebar-notification-dot { border-color: #c8f246; }
+
+.vista-sidebar-link:hover,
+.vista-sidebar-link:focus-visible {
+  background: rgba(200, 242, 70, .16);
+  color: #c8f246;
+  outline: 0;
+}
+
+.vista-sidebar-link.active {
+  background: #c8f246;
+  color: #0c0d0b;
+}
+
+.vista-sidebar-icon {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 18px;
+  font-size: 19px;
+  height: 20px;
+  justify-content: center;
+}
+
+.vista-sidebar-text {
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+
+.vista-sidebar:hover .vista-sidebar-text,
+.vista-sidebar:focus-within .vista-sidebar-text {
+  opacity: 1;
+}
+
+.vista-sidebar-bottom {
+  margin-top: auto;
+}

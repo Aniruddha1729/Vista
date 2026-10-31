@@ -1,0 +1,17 @@
+.vee-assistant { bottom: 24px; position: fixed; right: 24px; z-index: 100; }
+.vee-launcher { align-items: center; background: #101510; border: 1px solid rgba(200,242,70,.35); border-radius: 999px; box-shadow: 0 12px 34px rgba(13,22,10,.26); color: #f5f7ed; cursor: pointer; display: flex; font: inherit; font-size: 12px; font-weight: 700; gap: 9px; padding: 8px 15px 8px 8px; }
+.vee-launcher:hover { transform: translateY(-2px); }
+.vee-launcher-mark,.vee-avatar { align-items: center; background: #c8f246; border-radius: 50%; color: #16200c; display: inline-flex; font-family: Georgia,serif; font-size: 17px; font-style: italic; height: 34px; justify-content: center; width: 34px; }
+.vee-chat { background: var(--vista-surface, #fff); border: 1px solid var(--vista-border, rgba(20,25,15,.14)); border-radius: 20px; bottom: 62px; box-shadow: 0 20px 65px rgba(10,15,7,.22); color: var(--vista-text, #11130f); display: flex; flex-direction: column; height: min(510px, calc(100vh - 130px)); overflow: hidden; position: absolute; right: 0; width: min(370px, calc(100vw - 32px)); }
+.vee-chat-header { align-items: center; background: #111811; color: #f8faef; display: flex; gap: 10px; padding: 14px 16px; }
+.vee-chat-header > div { display: grid; gap: 3px; }
+.vee-chat-header small { color: #bcc7b4; font-size: 10px; }
+.vee-chat-header button { background: transparent; border: 0; color: #eaf2dd; cursor: pointer; font-size: 25px; margin-left: auto; }
+.vee-messages { display: flex; flex: 1; flex-direction: column; gap: 10px; overflow-y: auto; padding: 16px; }
+.vee-message { background: #edf2e5; border-radius: 14px 14px 14px 4px; color: #273120; font-size: 12px; line-height: 1.55; margin: 0; max-width: 88%; padding: 10px 12px; }
+.vee-message.you { align-self: end; background: #1a2318; border-radius: 14px 14px 4px 14px; color: #f7faed; }
+.vee-chat-form { border-top: 1px solid var(--vista-border, rgba(20,25,15,.12)); display: flex; gap: 8px; padding: 12px; }
+.vee-chat-form input { background: var(--vista-surface-soft, #f5f6f1); border: 1px solid var(--vista-border, rgba(20,25,15,.12)); border-radius: 12px; color: var(--vista-text, #11130f); flex: 1; font: inherit; font-size: 12px; min-width: 0; padding: 11px 12px; }
+.vee-chat-form button { background: #c8f246; border: 0; border-radius: 12px; color: #17210d; cursor: pointer; font-size: 19px; width: 42px; }
+.vee-chat-note { color: var(--vista-muted, #71756b); font-size: 9px; margin: -4px 12px 10px; text-align: center; }
+@media (max-width: 520px) { .vee-assistant { bottom: 14px; right: 14px; } .vee-chat { bottom: 60px; } }

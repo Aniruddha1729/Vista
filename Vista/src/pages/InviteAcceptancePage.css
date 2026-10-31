@@ -1,0 +1,12 @@
+.invite-acceptance-layout { background: #f7f8f2; display: flex; min-height: 100vh; }
+.invite-acceptance-sidebar { flex: 0 0 64px; }
+.invite-acceptance-sidebar .vista-sidebar { min-height: calc(100vh - 76px); }
+.invite-acceptance-page { flex: 1; min-width: 0; min-height: 100vh; }
+.invite-acceptance-card { background: #fff; border-radius: 22px; margin: 50px auto 80px; max-width: 620px; padding: 42px; }
+.invite-acceptance-card h1 { font-size: clamp(46px, 8vw, 72px); margin: 18px 0; overflow-wrap: anywhere; }
+.invite-acceptance-card > img { border-radius: 12px; max-height: 240px; object-fit: cover; width: 100%; }
+.invite-acceptance-card p { color: rgba(12,13,11,.68); line-height: 1.55; }
+.invite-acceptance-card button, .invite-acceptance-card > a { background: #0c0d0b; border: 0; border-radius: 10px; color: #fff; display: inline-block; font: inherit; margin-top: 12px; padding: 15px 19px; }
+.invite-acceptance-card button span { color: #c8f246; margin-left: 14px; }
+.invite-acceptance-error { background: #fff0ec; border-radius: 8px; padding: 12px; }
+@media (max-width: 850px) { .invite-acceptance-sidebar { display: none; } }

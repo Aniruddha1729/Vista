@@ -1,0 +1,11 @@
+.ticket-page { background: #f7f8f2; display: flex; min-height: 100vh; }
+.ticket-sidebar { flex: 0 0 64px; }
+.ticket-sidebar .vista-sidebar { min-height: calc(100vh - 76px); }
+.ticket-card { background: #fff; border-radius: 24px; flex: 0 1 520px; margin: 40px auto 80px; max-width: 520px; padding: 38px; text-align: center; }
+.ticket-card h1 { font-size: clamp(50px, 8vw, 72px); margin: 18px 0; }
+.ticket-card p { color: rgba(12,13,11,.65); line-height: 1.55; }
+.ticket-qr { display: block; margin: 20px auto; max-width: 300px; width: 100%; }
+.ticket-download, .ticket-back { display: block; font-size: 13px; margin-top: 15px; }
+.ticket-download { color: #52770a; }
+.ticket-back { color: #55594d; }
+@media (max-width: 850px) { .ticket-sidebar { display: none; } }
