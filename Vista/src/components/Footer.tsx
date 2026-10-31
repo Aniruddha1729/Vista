@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 function Footer() {
   return (
-    <footer className="site-footer" id="about">
+    <footer className="site-footer">
       <div className="footer-top">
         <div className="footer-brand"><Link className="brand" to="/" aria-label="Vista home"><img className="brand-wordmark" src="/vista-wordmark.png" alt="Vista" /></Link><p>Make room for<br /><em>the good stuff.</em></p></div>
         <div className="footer-column"><strong>Discover</strong><Link to="/events">Explore events</Link><Link to="/saved-events">Saved events</Link><a href="#how-it-works">How it works</a></div>

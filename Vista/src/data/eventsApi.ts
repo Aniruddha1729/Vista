@@ -47,6 +47,7 @@ export type EventCardData = {
   isSaved?: boolean
   registrationId?: string
   invitedBy?: string
+  priceLabel: string
 }
 
 export const allEventsCategory = 'All events'
@@ -56,6 +57,9 @@ export async function getEventDiscovery() {
 }
 
 export function toEventCard(event: EventRecord): EventCardData {
+  const priceLabel = event.priceAmountPaise && event.priceAmountPaise > 0
+    ? `${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(event.priceAmountPaise / 100)}${event.priceUnit === 'team' ? ' / team' : ' / person'}`
+    : event.price || 'Free'
   return {
     id: event._id,
     slug: event.slug,
@@ -66,6 +70,7 @@ export function toEventCard(event: EventRecord): EventCardData {
     category: event.category,
     image: event.poster || undefined,
     startsAt: event.startDate,
+    priceLabel,
   }
 }
 

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
 import { useTheme } from '../theme/useTheme'
@@ -13,7 +13,24 @@ function LoggedInHeader() {
   const location = useLocation()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const profileMenuRef = useRef<HTMLDivElement>(null)
   const pendingInvitations = usePendingInvitationCount()
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function closeOnOutsidePointer(event: PointerEvent) {
+      if (event.target instanceof Node && !profileMenuRef.current?.contains(event.target)) setMenuOpen(false)
+    }
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOnOutsidePointer)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePointer)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [menuOpen])
   const signedInNavigation = [
     { label: 'Events', href: '/events' },
     { label: 'Registered', href: '/registered-events' },
@@ -37,7 +54,7 @@ function LoggedInHeader() {
         <GooeyNav items={signedInNavigation} activeIndex={activeIndex} onChange={(_index: number, item: { label: string; href?: string }) => { setMenuOpen(false); if (item.href) navigate(item.href) }} style={{}} theme="light" color="#c8f246" activeTextColor="#11130f" size="sm" frame={false} particleCount={12} spread={36} animationTime={480} className="site-gooey-nav logged-in-gooey-nav" />
       </Suspense>
 
-      <div className="logged-in-actions">
+      <div className="logged-in-actions" ref={profileMenuRef}>
         {user && <Link className="free-tier" to="/plans" aria-label="View plan options">{user.plan === 'pro' ? 'Pro plan' : 'Free tier'} <span aria-hidden="true">↗</span></Link>}
         <button className="profile-button" type="button" aria-label="Open profile menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>
           <span className="profile-mark">{user?.name?.[0]?.toUpperCase() || 'V'}</span>

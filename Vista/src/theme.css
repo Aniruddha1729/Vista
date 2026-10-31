@@ -25,14 +25,53 @@ body[data-theme='dark'] { background: var(--vista-bg); color: var(--vista-text);
 [data-theme='dark'] .home-category-icon { color: #b8df56; }
 [data-theme='dark'] .event-time-badge { background: rgba(27,32,25,.94); border-color: var(--vista-border); color: var(--vista-text); }
 [data-theme='dark'] .event-time-badge.passed { background: rgba(8,10,8,.9); color: #fff; }
+[data-theme='dark'] .event-card { color: var(--vista-text); }
+[data-theme='dark'] .event-card:hover,[data-theme='dark'] .event-card:focus-visible { color: var(--vista-text); }
+[data-theme='dark'] .event-card-category { background: #2b3520; color: #c8eb7a; }
+[data-theme='dark'] .event-card-price { background: #2b3520; border-color: var(--vista-border); color: #d8f296; }
 [data-theme='dark'] :is(.events-show-more,.collection-remove-saved) { border-color: var(--vista-border); color: var(--vista-text); }
 [data-theme='dark'] .home-category-tile > span,
 [data-theme='dark'] .home-step-grid p,
 [data-theme='dark'] .home-stats span { color: var(--vista-muted); }
 [data-theme='dark'] .home-how { background: var(--vista-surface); }
+[data-theme='dark'] .home-about-heading > p { color: var(--vista-muted); }
+[data-theme='dark'] .home-about-card { background: var(--vista-surface); border-color: var(--vista-border); }
+[data-theme='dark'] .home-about-card h3 { color: var(--vista-text); }
+[data-theme='dark'] .home-about-card p,[data-theme='dark'] .about-card-number { color: var(--vista-muted); }
+[data-theme='dark'] .home-about-footnote { border-color: var(--vista-border); color: var(--vista-muted); }
+[data-theme='dark'] .home-about-footnote a { color: #d8f296; }
+[data-theme='dark'] .about-card-icon { background: #2b3520; color: #d8f296; }
+[data-theme='dark'] .about-card-icon-lime { background: #c8f246; color: #273510; }
+[data-theme='dark'] .about-card-icon-cream { background: #433f31; color: #f3dd9e; }
+[data-theme='dark'] .about-card-icon-dark { background: #303a2b; color: #d8f296; }
 [data-theme='dark'] .home-step-grid article,
 [data-theme='dark'] .home-stats,
 [data-theme='dark'] .home-stats div { border-color: var(--vista-border); }
+
+@media (max-width: 900px) {
+  .home-about { padding-left: 24px; padding-right: 24px; }
+  .home-about-feature { grid-template-columns: 1fr 1fr; }
+  .home-about-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
+  .home-about { padding: 20px 18px 58px; }
+  .home-about-heading { align-items: start; flex-direction: column; gap: 16px; }
+  .home-about-heading > p { font-size: 13px; }
+  .home-about-feature { grid-template-columns: 1fr; }
+  .home-about-copy { padding: 30px 25px; }
+  .home-about-copy h3 { font-size: 39px; }
+  .home-about-art { min-height: 330px; }
+  .about-ticket { transform: rotate(-7deg) translate(-28px,2px) scale(.9); }
+  .about-qr-card { right: 8%; top: 13%; transform: rotate(7deg) scale(.9); }
+  .about-checkin-chip { bottom: 13%; right: 6%; }
+  .home-about-grid { grid-template-columns: 1fr; }
+  .home-about-card { min-height: 0; padding: 19px; }
+  .home-about-card h3 { font-size: 19px; }
+  .home-about-footnote { align-items: start; flex-direction: column; gap: 11px; line-height: 1.5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-about-card,.home-about-link { transition: none; }
+}
 [data-theme='dark'] .home-final-cta { background: #c8f246; color: #11140f; }
 [data-theme='dark'] :is(.auth-card,.event-card,.collection-event-card,.notification-card,.notification-empty,.profile-photo-card,.profile-form,.settings-card,.ticket-card,.invite-acceptance-card,.registration-success,.public-register-card,.workspace-panel,.event-editor-form,.invite-panel,.invite-row,.invite-template-choice,.share-link-box,.profile-menu,.public-section,.registration-section,.registration-form,.sidebar-style-option) { background-color: var(--vista-surface) !important; color: var(--vista-text); }
 [data-theme='dark'] .profile-menu a,

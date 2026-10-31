@@ -51,6 +51,50 @@ function Home() {
           <article><span>03</span><h3>Scan</h3><p>Welcome people in with a quick QR check-in at the door.</p></article>
         </div>
       </section>
+      <section className="home-about" id="about" aria-labelledby="home-about-title">
+        <div className="home-about-heading">
+          <div><span className="section-eyebrow">A calmer way to bring people together</span><h2 id="home-about-title">Everything around<br />a great <em>event.</em></h2></div>
+          <p>Vista gives campus communities one clear place to discover what’s happening, bring an idea to life, and welcome people through the door.</p>
+        </div>
+        <article className="home-about-feature">
+          <div className="home-about-copy">
+            <span className="home-about-kicker"><i /> Made for the whole journey</span>
+            <h3>From “you’re invited”<br />to “you’re checked in.”</h3>
+            <p>Create a polished event page, share it with your campus, collect registrations, and see who has arrived. The details and the check-in list stay together, so hosting feels easy before, during, and after the event.</p>
+            <Link to="/events" className="home-about-link">See what’s happening <span>↗</span></Link>
+          </div>
+          <div className="home-about-art" aria-label="Illustration of a digital event ticket and QR check-in" role="img">
+            <div className="about-orbit about-orbit-one" /><div className="about-orbit about-orbit-two" />
+            <div className="about-ticket">
+              <div className="about-ticket-top"><span>VISTA PASS</span><b>✳</b></div>
+              <strong>Campus<br /><em>Film Night</em></strong>
+              <div className="about-ticket-bottom"><span>FRI · 7:00 PM</span><span>GATE 02</span></div>
+            </div>
+            <div className="about-qr-card"><svg viewBox="0 0 7 7" aria-hidden="true"><path d="M0 0h3v3H0zM1 1v1h1V1zM4 0h3v3H4zM5 1v1h1V1zM0 4h3v3H0zM1 5v1h1V5zM4 4h1v1H4zM6 4h1v1H6zM4 6h1v1H4zM6 6h1v1H6zM3 3h1v1H3zM5 3h1v1H5zM3 5h1v1H3z" /></svg><span>Ready to scan</span></div>
+            <div className="about-checkin-chip"><b>✓</b><span><strong>Entry verified</strong><small>Ticket scanned just now</small></span></div>
+            <span className="about-art-spark about-art-spark-one">✳</span><span className="about-art-spark about-art-spark-two">✦</span>
+          </div>
+        </article>
+        <div className="home-about-grid">
+          <article className="home-about-card">
+            <span className="about-card-number">01 / HOST</span><span className="about-card-icon" aria-hidden="true">✳</span>
+            <h3>Hosting, without the hassle.</h3><p>Build a clear event page with the date, venue, capacity, team options, prizes, and the details people need to say yes.</p>
+          </article>
+          <article className="home-about-card">
+            <span className="about-card-number">02 / INVITE</span><span className="about-card-icon about-card-icon-lime" aria-hidden="true">↗</span>
+            <h3>Invites that feel like yours.</h3><p>Choose an invitation design, add your message, and send invitations or share a public link that’s easy to pass around.</p>
+          </article>
+          <article className="home-about-card">
+            <span className="about-card-number">03 / REGISTER</span><span className="about-card-icon about-card-icon-cream" aria-hidden="true">◎</span>
+            <h3>Registration made simple.</h3><p>Guests sign up online, accept team requests when needed, and keep their event ticket ready in Vista.</p>
+          </article>
+          <article className="home-about-card">
+            <span className="about-card-number">04 / PAYMENTS</span><span className="about-card-icon about-card-icon-dark" aria-hidden="true">₹</span>
+            <h3>Clear payments and tracking.</h3><p>Offer free or paid individual registration with Razorpay checkout. Organisers can review collections, fees, refunds, and recorded withdrawal requests in the event ledger.</p>
+          </article>
+        </div>
+        <div className="home-about-footnote"><span>Designed for student organisers and curious campus communities.</span><Link to="/host-event">Start an event <b>↗</b></Link></div>
+      </section>
       <section className="home-stats" aria-label="Vista at a glance">
         <div><strong>{discovery?.publishedEvents.toLocaleString() ?? '—'}</strong><span>published campus events</span></div><div><strong>{discovery?.categories.length.toLocaleString() ?? '—'}</strong><span>event categories to explore</span></div><div><strong>{discovery?.registeredPlaces.toLocaleString() ?? '—'}</strong><span>confirmed event places</span></div>
       </section>

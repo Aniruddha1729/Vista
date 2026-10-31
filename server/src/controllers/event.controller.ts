@@ -12,7 +12,7 @@ import { verifyQrToken } from '../utils/qr-token.js'
 import { sendRegistrationConfirmation, sendTeamRegistrationRequest } from '../services/email.js'
 import { hasProTier } from '../utils/user-plan.js'
 
-const eventInput = z.object({
+export const eventInput = z.object({
   title: z.string().trim().min(3).max(120),
   description: z.string().trim().min(10).max(5000),
   category: z.string().trim().min(2).max(50),

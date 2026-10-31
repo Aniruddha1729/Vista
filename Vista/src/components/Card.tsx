@@ -18,7 +18,7 @@ function getCountdown(startsAt: string, now: number) {
   return `Starts in ${minutes}m`
 }
 
-function Card({ id, title, description, date, location, category, image, invitedBy, startsAt, isSaved }: EventCardProps) {
+function Card({ id, title, description, date, location, category, image, invitedBy, startsAt, isSaved, priceLabel }: EventCardProps) {
   const [now, setNow] = useState(() => Date.now())
   const countdown = getCountdown(startsAt, now)
   useEffect(() => {
@@ -42,6 +42,7 @@ function Card({ id, title, description, date, location, category, image, invited
         <div className="event-card-meta">
           <span>{date}</span>
           <span>{location}</span>
+          <span className="event-card-price">{priceLabel}</span>
         </div>
       </div>
     </Link>
