@@ -115,6 +115,11 @@ export async function getMyEvents(token: string, userId?: string) {
     .map((registration) => ({ ...toEventCard(registration.event), registrationId: registration._id, invitedBy: registration.teamLeader && registration.teamLeader._id !== userId ? registration.teamLeader.username : undefined }))
 }
 
+export async function getMyHostedEvents(token: string) {
+  const result = await eventsRequest<{ events: EventRecord[] }>('/mine/hosted', token)
+  return result.events
+}
+
 export type TeamInvitationData = {
   id: string
   teamName: string

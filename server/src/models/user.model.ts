@@ -27,6 +27,8 @@ const userSchema = new mongoose.Schema({
   passwordHash: { type: String, required: true },
   role: { type: String, enum: ['student', 'organizer', 'admin'], default: 'student' },
   plan: { type: String, enum: ['free', 'pro'], default: 'free' },
+  proSubscriptionId: String,
+  proExpiresAt: Date,
   avatarUrl: String,
   sidebarStyle: { type: String, enum: ['hover', 'dock'], default: 'hover' },
   profile: { type: profileSchema, default: () => ({}) },

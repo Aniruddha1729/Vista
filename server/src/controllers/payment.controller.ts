@@ -11,6 +11,7 @@ import { randomUUID } from 'node:crypto'
 import { calculatePlatformFeePaise } from '../services/event-ledger.js'
 import { withEventLedgerLock } from '../services/event-ledger.js'
 import { LedgerEntry } from '../models/ledger-entry.model.js'
+import { hasProTier } from '../utils/user-plan.js'
 
 const razorpayBase = 'https://api.razorpay.com/v1'
 function razorpayAuth() {
@@ -58,6 +59,53 @@ export async function createEventOrder(request: Request, response: Response) {
   if (!orderResponse.ok || !order.id) return response.status(502).json({ message: order.error?.description || 'Razorpay could not create a payment order.' })
   await PaymentAttempt.create({ orderId: order.id, event: event.id, user: request.auth.sub, amount, baseAmountPaise: event.priceAmountPaise, platformFeePaise, platformFeePayer: event.platformFeePayer || 'organiser', formData: parsed.data.formData })
   response.status(201).json({ orderId: order.id, amount, baseAmountPaise: event.priceAmountPaise, platformFeePaise, currency: 'INR', keyId: process.env.RAZORPAY_KEY_ID, eventName: event.title })
+}
+
+export async function createProSubscription(request: Request, response: Response) {
+  const authorization = razorpayAuth()
+  const planId = process.env.RAZORPAY_PRO_PLAN_ID
+  if (!authorization || !planId) return response.status(503).json({ message: 'Pro billing is not configured. Set RAZORPAY_PRO_PLAN_ID to the monthly ₹500 Razorpay plan.' })
+  const user = await User.findById(request.auth.sub).select('plan proExpiresAt email name')
+  if (!user) return response.status(404).json({ message: 'Account not found.' })
+  if (hasProTier(user)) return response.status(409).json({ message: 'Your account already has Pro.' })
+
+  const planResponse = await fetch(`${razorpayBase}/plans/${encodeURIComponent(planId)}`, { headers: { Authorization: authorization } })
+  const plan = await planResponse.json() as { id?: string; period?: string; interval?: number; item?: { amount?: number; currency?: string }; error?: { description?: string } }
+  if (!planResponse.ok || plan.id !== planId) return response.status(502).json({ message: plan.error?.description || 'Razorpay could not verify the Pro plan.' })
+  if (plan.period !== 'monthly' || plan.interval !== 1 || plan.item?.amount !== 50000 || plan.item.currency !== 'INR') {
+    return response.status(503).json({ message: 'The configured Razorpay plan must be ₹500 INR, billed monthly.' })
+  }
+
+  const subscriptionResponse = await fetch(`${razorpayBase}/subscriptions`, {
+    method: 'POST', headers: { Authorization: authorization, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plan_id: planId, total_count: 120, quantity: 1, customer_notify: 1, notes: { userId: request.auth.sub, product: 'Vista Pro' } }),
+  })
+  const subscription = await subscriptionResponse.json() as { id?: string; status?: string; error?: { description?: string } }
+  if (!subscriptionResponse.ok || !subscription.id) return response.status(502).json({ message: subscription.error?.description || 'Razorpay could not start Pro checkout.' })
+  user.set('proSubscriptionId', subscription.id)
+  await user.save()
+  response.status(201).json({ subscriptionId: subscription.id, keyId: process.env.RAZORPAY_KEY_ID, customerName: user.name, customerEmail: user.email, amount: 50000, currency: 'INR' })
+}
+
+export async function verifyProSubscription(request: Request, response: Response) {
+  const parsed = z.object({ razorpay_payment_id: z.string(), razorpay_subscription_id: z.string(), razorpay_signature: z.string() }).safeParse(request.body)
+  if (!parsed.success) return response.status(400).json({ message: 'Razorpay subscription details are incomplete.' })
+  const user = await User.findOne({ _id: request.auth.sub, proSubscriptionId: parsed.data.razorpay_subscription_id }).select('plan proSubscriptionId')
+  if (!user) return response.status(404).json({ message: 'Pro subscription not found for this account.' })
+  const secret = process.env.RAZORPAY_KEY_SECRET
+  if (!secret) return response.status(503).json({ message: 'Pro payment verification is not configured.' })
+  const expected = createHmac('sha256', secret).update(`${parsed.data.razorpay_payment_id}|${parsed.data.razorpay_subscription_id}`).digest()
+  const supplied = Buffer.from(parsed.data.razorpay_signature, 'hex')
+  if (expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) return response.status(400).json({ message: 'Razorpay subscription signature verification failed.' })
+  const statusResponse = await fetch(`${razorpayBase}/subscriptions/${encodeURIComponent(parsed.data.razorpay_subscription_id)}`, { headers: { Authorization: razorpayAuth()! } })
+  const subscription = await statusResponse.json() as { status?: string; plan_id?: string; current_end?: number; error?: { description?: string } }
+  if (!statusResponse.ok || subscription.plan_id !== process.env.RAZORPAY_PRO_PLAN_ID) return response.status(402).json({ message: subscription.error?.description || 'Razorpay could not verify this Pro subscription.' })
+  if (subscription.status === 'active') {
+    user.set('plan', 'pro')
+    user.set('proExpiresAt', subscription.current_end ? new Date(subscription.current_end * 1000) : undefined)
+    await user.save()
+  }
+  response.json({ status: subscription.status, plan: user.get('plan'), message: subscription.status === 'active' ? 'Pro is active.' : 'Payment authorization received. Pro will activate when Razorpay confirms the first monthly charge.' })
 }
 
 export async function verifyEventPayment(request: Request, response: Response) {

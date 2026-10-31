@@ -2,14 +2,15 @@ import type { Request, Response } from 'express'
 import { Event } from '../models/event.model.js'
 import { LedgerEntry } from '../models/ledger-entry.model.js'
 import { PaymentAttempt } from '../models/payment-attempt.model.js'
+import { User } from '../models/user.model.js'
 import { calculateRefundedPlatformFeePaise, withEventLedgerLock } from '../services/event-ledger.js'
 import { verifyRazorpayWebhookSignature } from '../utils/razorpay-signature.js'
 
 type GatewayEntity = {
   id?: string; order_id?: string; payment_id?: string; amount?: number; fee?: number; tax?: number
-  notes?: Record<string, string>; status?: string
+  notes?: Record<string, string>; status?: string; current_end?: number
 }
-type RazorpayWebhook = { event?: string; payload?: { payment?: { entity?: GatewayEntity }; refund?: { entity?: GatewayEntity }; payout?: { entity?: GatewayEntity }; transfer?: { entity?: GatewayEntity } } }
+type RazorpayWebhook = { event?: string; payload?: { payment?: { entity?: GatewayEntity }; refund?: { entity?: GatewayEntity }; payout?: { entity?: GatewayEntity }; transfer?: { entity?: GatewayEntity }; subscription?: { entity?: GatewayEntity } } }
 
 function isPaise(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
@@ -118,7 +119,7 @@ export async function razorpayWebhook(request: Request, response: Response) {
   if (!secret || !rawBody || !signature) return response.status(400).json({ message: 'Webhook signature configuration or raw payload is missing.' })
   if (!verifyRazorpayWebhookSignature(rawBody, signature, secret)) return response.status(400).json({ message: 'Invalid Razorpay webhook signature.' })
   const body = JSON.parse(rawBody.toString('utf8')) as RazorpayWebhook
-  const entity = body.payload?.payment?.entity || body.payload?.refund?.entity || body.payload?.payout?.entity || body.payload?.transfer?.entity
+  const entity = body.payload?.payment?.entity || body.payload?.refund?.entity || body.payload?.payout?.entity || body.payload?.transfer?.entity || body.payload?.subscription?.entity
   try {
     if (body.event === 'payment.captured' && body.payload?.payment?.entity) await handleCapturedPayment(body.payload.payment.entity)
     else if (body.event === 'refund.created' && body.payload?.refund?.entity) await handleRefund(body.payload.refund.entity, 'processing')
@@ -131,6 +132,12 @@ export async function razorpayWebhook(request: Request, response: Response) {
     else if (body.event === 'transfer.processed' && body.payload?.transfer?.entity) await handlePayout(body.payload.transfer.entity, 'processed')
     else if (body.event === 'transfer.failed' && body.payload?.transfer?.entity) await handlePayout(body.payload.transfer.entity, 'failed')
     else if (body.event === 'transfer.reversed' && body.payload?.transfer?.entity) await handlePayout(body.payload.transfer.entity, 'processed', true)
+    else if (body.payload?.subscription?.entity?.id && ['subscription.activated', 'subscription.charged', 'subscription.resumed'].includes(body.event || '')) {
+      const subscription = body.payload.subscription.entity
+      await User.updateOne({ proSubscriptionId: subscription.id }, { $set: { plan: 'pro', ...(subscription.current_end ? { proExpiresAt: new Date(subscription.current_end * 1000) } : {}) } })
+    } else if (body.payload?.subscription?.entity?.id && ['subscription.cancelled', 'subscription.halted', 'subscription.completed'].includes(body.event || '')) {
+      await User.updateOne({ proSubscriptionId: body.payload.subscription.entity.id }, { $set: { plan: 'free' }, $unset: { proExpiresAt: 1 } })
+    }
     response.status(200).json({ received: true })
   } catch (error) {
     console.error('Razorpay webhook processing failed:', body.event, entity?.id, error)

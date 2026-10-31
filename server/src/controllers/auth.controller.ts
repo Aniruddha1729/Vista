@@ -7,6 +7,7 @@ import { sendEmail } from '../services/email.js'
 import { uploadAvatarToCloudinary } from '../services/cloudinary.js'
 import { User } from '../models/user.model.js'
 import { createAccessToken, createRefreshToken, refreshCookieOptions, verifyRefreshToken } from '../utils/tokens.js'
+import { hasProTier } from '../utils/user-plan.js'
 
 const signupSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -24,6 +25,7 @@ type UserAccount = {
   email: string
   role: 'student' | 'organizer' | 'admin'
   plan: 'free' | 'pro'
+  proExpiresAt?: Date | null
   avatarUrl?: string
   sidebarStyle: 'hover' | 'dock'
   emailVerified: boolean
@@ -37,7 +39,7 @@ function publicUser(user: UserAccount) {
     username: user.username,
     email: user.email,
     role: user.role,
-    plan: user.plan,
+    plan: hasProTier(user) ? 'pro' : 'free',
     avatarUrl: user.avatarUrl,
     sidebarStyle: user.sidebarStyle,
     emailVerified: user.emailVerified,

@@ -9,12 +9,30 @@ import { renderInviteEmail } from '../services/invite-template.js'
 import { eventHasRoomFilter } from '../utils/capacity.js'
 import { createInviteToken, hashInviteToken } from '../utils/invite-token.js'
 import type { InviteTemplateName } from '../services/invite-template.js'
+import { hasProTier } from '../utils/user-plan.js'
 
 const invitePreferences = z.object({
   template: z.enum(['minimal', 'bold-gradient', 'dark-neon', 'formal']),
   personalMessage: z.string().max(1000).optional(),
 })
 const inviteExpiresInMs = 30 * 24 * 60 * 60 * 1000
+const freeInviteLimit = 5
+
+async function reserveInviteSlot(eventId: string, unlimited: boolean) {
+  const event = await Event.findById(eventId).select('inviteCount').lean()
+  if (!event) return false
+  if (event.inviteCount === undefined || event.inviteCount === null) {
+    const existingCount = await Registration.countDocuments({ event: eventId, type: 'invited', status: { $ne: 'cancelled' } })
+    await Event.updateOne({ _id: eventId, inviteCount: { $exists: false } }, { $set: { inviteCount: existingCount } })
+  }
+  const filter = unlimited ? { _id: eventId } : { _id: eventId, inviteCount: { $lt: freeInviteLimit } }
+  const reservation = await Event.updateOne(filter, { $inc: { inviteCount: 1 } })
+  return reservation.matchedCount > 0
+}
+
+async function releaseInviteSlot(eventId: string) {
+  await Event.updateOne({ _id: eventId, inviteCount: { $gt: 0 } }, { $inc: { inviteCount: -1 } })
+}
 
 function inviteUrl(token: string) {
   const clientUrl = (process.env.CLIENT_URL || '').split(',')[0].trim().replace(/\/$/, '')
@@ -51,6 +69,10 @@ async function sendInvitation(registration: { inviteEmail?: string } | null, eve
 export async function invitePreview(request: Request, response: Response) {
   const parsed = invitePreferences.safeParse(request.body)
   if (!parsed.success) return response.status(400).json({ message: 'Choose a valid invitation design.' })
+  if (parsed.data.template !== 'minimal') {
+    const actor = await User.findById(request.auth.sub).select('plan proExpiresAt')
+    if (!hasProTier(actor)) return response.status(403).json({ code: 'pro_required', message: 'Premium invitation previews are a Pro feature.' })
+  }
   const host = await User.findById(request.event.host).select('name')
   const html = renderInviteEmail({
     template: parsed.data.template,
@@ -79,6 +101,11 @@ export async function createInvite(request: Request, response: Response) {
 
   const email = parsed.data.email.toLowerCase()
   const event = request.event
+  const actor = await User.findById(request.auth.sub).select('plan proExpiresAt')
+  const unlimited = hasProTier(actor)
+  if (!hasProTier(actor) && event.inviteTemplate !== 'minimal') {
+    return response.status(403).json({ code: 'pro_required', message: 'Sending premium invitation designs requires the Pro plan.' })
+  }
   const existingUser = await User.findOne({ email }).select('_id')
   if (existingUser) {
     const existingRegistration = await Registration.findOne({ user: existingUser.id, event: event.id })
@@ -87,20 +114,30 @@ export async function createInvite(request: Request, response: Response) {
   const existingInvite = await Registration.findOne({ event: event.id, inviteEmail: email })
   if (existingInvite) return response.status(409).json({ message: 'This email already has an invitation. Resend it from the invite list.' })
 
+  const inviteSlotReserved = await reserveInviteSlot(String(event.id), unlimited)
+  if (!inviteSlotReserved) return response.status(403).json({ code: 'pro_required', message: 'Free plan includes up to 5 invitations per event. Upgrade to Pro for unlimited invitations.' })
+
   const token = createInviteToken()
-  const registration = await Registration.create({
-    event: event.id,
-    type: 'invited',
-    status: 'pending',
-    inviteEmail: email,
-    inviteTokenHash: hashInviteToken(token),
-    inviteExpiresAt: new Date(Date.now() + inviteExpiresInMs),
-  })
+  let registration
+  try {
+    registration = await Registration.create({
+      event: event.id,
+      type: 'invited',
+      status: 'pending',
+      inviteEmail: email,
+      inviteTokenHash: hashInviteToken(token),
+      inviteExpiresAt: new Date(Date.now() + inviteExpiresInMs),
+    })
+  } catch (error) {
+    await releaseInviteSlot(String(event.id))
+    throw error
+  }
 
   try {
     await sendInvitation(registration, event, token)
   } catch (error) {
     await registration.deleteOne()
+    await releaseInviteSlot(String(event.id))
     console.error('Could not send event invitation:', error)
     return response.status(502).json({ message: 'Could not send the invitation. Check Brevo settings and try again.' })
   }
@@ -108,6 +145,10 @@ export async function createInvite(request: Request, response: Response) {
 }
 
 export async function resendInvite(request: Request, response: Response) {
+  const actor = await User.findById(request.auth.sub).select('plan proExpiresAt')
+  if (!hasProTier(actor) && request.event.inviteTemplate !== 'minimal') {
+    return response.status(403).json({ code: 'pro_required', message: 'Sending premium invitation designs requires the Pro plan.' })
+  }
   const registration = await Registration.findOne({ _id: request.params.registrationId, event: request.params.id, type: 'invited', status: 'pending' }).select('+inviteTokenHash')
   if (!registration) return response.status(404).json({ message: 'Pending invitation not found.' })
   const event = request.event
@@ -127,6 +168,7 @@ export async function resendInvite(request: Request, response: Response) {
 export async function deleteInvite(request: Request, response: Response) {
   const invite = await Registration.findOneAndDelete({ _id: request.params.registrationId, event: request.params.id, type: 'invited', status: 'pending' })
   if (!invite) return response.status(404).json({ message: 'Pending invitation not found.' })
+  await releaseInviteSlot(String(request.event.id))
   response.status(204).end()
 }
 

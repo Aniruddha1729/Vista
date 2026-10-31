@@ -4,6 +4,7 @@ import { SidebarUnfoldableExample } from '../components/Sidebar'
 import { useAuth } from '../auth/useAuth'
 import { authenticatedFetch } from '../auth/authenticatedFetch'
 import { useTheme } from '../theme/useTheme'
+import { Link } from 'react-router-dom'
 import './SettingsPage.css'
 
 type SidebarStyle = 'hover' | 'dock'
@@ -83,6 +84,10 @@ function SettingsPage() {
           <section className="settings-card theme-setting-card">
             <div><span className="section-eyebrow">Appearance</span><h2>Color theme</h2><p>Currently using {theme} mode. By default, Vista follows your device setting.</p></div>
             <button className="settings-secondary-button" onClick={toggleTheme} type="button">Switch to {theme === 'dark' ? 'light' : 'dark'} mode</button>
+          </section>
+          <section className="settings-card upgrade-plan-card">
+            <div><span className="section-eyebrow">More room to grow</span><h2>{user?.plan === 'pro' ? 'You’re on Pro.' : 'Upgrade your plan.'}</h2><p>{user?.plan === 'pro' ? 'Your Pro plan includes unlimited invitations, permissions, and premium styles.' : 'Unlock unlimited invitations and event staff, plus premium event page styles for ₹500 per month.'}</p></div>
+            <Link className="settings-submit" to="/plans">{user?.plan === 'pro' ? 'Manage plan' : 'View plans'} <span>↗</span></Link>
           </section>
           <section className="settings-card">
             <div className="settings-card-heading"><div><span className="section-eyebrow">Help us improve Vista</span><h2>Report an issue.</h2><p>We’ll include your name and email with the message.</p></div></div>

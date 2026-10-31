@@ -63,6 +63,27 @@ body[data-theme='dark'] { background: var(--vista-bg); color: var(--vista-text);
 [data-theme='dark'] .applicant-type { color: #14200a !important; }
 [data-theme='dark'] .scanner-result-success { background: #27391b; color: #edffd4; }
 [data-theme='dark'] .scanner-result-success h2,.scanner-result-success p { color: #edffd4; }
+[data-theme='dark'] main :is(h1,h2,h3,h4,p,li,label,small,strong,legend,dt,dd,th,td,figcaption) { color: var(--vista-text) !important; }
+[data-theme='dark'] main :is(.section-eyebrow,.collection-summary,.workspace-panel-count,.finance-eligibility,.finance-status,.finance-notice) { color: var(--vista-muted) !important; }
+[data-theme='dark'] main :is(.plans-note,.collection-summary,.collection-intro p,.settings-card p,.finance-heading p,.finance-request p,.finance-history > p) { color: var(--vista-muted) !important; }
+[data-theme='dark'] .site-header { background: rgba(25,29,23,.95); border-color: var(--vista-border); color: var(--vista-text); }
+[data-theme='dark'] .main-nav a,[data-theme='dark'] .site-header .sign-in { color: var(--vista-text) !important; }
+[data-theme='dark'] .main-nav a:hover,[data-theme='dark'] .main-nav a:focus-visible,[data-theme='dark'] .main-nav a.active { background: #c8f246; color: #11140f !important; }
+[data-theme='dark'] .header-theme-toggle { border-color: var(--vista-border); color: var(--vista-text); }
+[data-theme='dark'] .header-theme-toggle:hover { background: var(--vista-surface-soft); }
+[data-theme='dark'] :is(.finance-panel,.finance-breakdown,.finance-history,.finance-request,.finance-primary-grid article:not(.finance-highlight),.style-lock-panel) { background: var(--vista-surface) !important; border-color: var(--vista-border) !important; }
+[data-theme='dark'] .finance-payout-strip,.workspace-plan-note { background: var(--vista-surface-soft) !important; border-color: var(--vista-border) !important; }
+[data-theme='dark'] :is(.finance-breakdown-row,.finance-breakdown-row strong,.finance-breakdown-row.total,.finance-primary-grid article strong) { color: var(--vista-text) !important; }
+[data-theme='dark'] :is(.finance-breakdown-row.deduction strong,.finance-status.failed) { color: #ffb5a5 !important; }
+[data-theme='dark'] .finance-primary-grid .finance-highlight { background: #172117 !important; }
+[data-theme='dark'] .finance-primary-grid .finance-highlight :is(small,strong,span) { color: #d3f36a !important; }
+[data-theme='dark'] .finance-notice { background: #38301d; color: #f1d696 !important; }
+[data-theme='dark'] .plans-checkout-error { background: #442923 !important; color: #ffd0c5 !important; }
+[data-theme='dark'] .plans-checkout-message { background: #303b22 !important; color: #d9f6a2 !important; }
+[data-theme='dark'] .style-lock-panel p { color: var(--vista-muted) !important; }
+[data-theme='dark'] .style-lock-panel .event-form-submit { color: #11140f !important; }
+[data-theme='dark'] .header-theme-toggle { color: var(--vista-text) !important; }
+[data-theme='dark'] main h1 em { color: #b8df56 !important; }
 
 .vista-sidebar.vista-sidebar-dock,
 .vista-sidebar.vista-sidebar-dock:hover,

@@ -124,7 +124,7 @@ function EventRegistrationPage() {
                 <h2>Team request sent.</h2>
                 <p><strong>{teamRequest.teamName}</strong> will be registered for {eventInfo?.title} once every teammate accepts and there are enough places for the full team. Requests expire {new Date(teamRequest.expiresAt).toLocaleString()}.</p>
                 <div className="team-request-status-list">{teamRequest.members.map((member) => <div key={member.email}><span>{member.email}</span><strong>{member.status === 'accepted' ? 'Accepted' : 'Waiting'}</strong></div>)}</div>
-                <Link to="/my-events">View registered events ↗</Link>
+                <Link to="/registered-events">View registered events ↗</Link>
                 <Link to={`/events/${eventInfo?._id || eventId}`}>Return to event</Link>
               </section>
             ) : isEventHost ? (

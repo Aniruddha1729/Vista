@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { eventsRequest } from '../data/eventsApi'
 import type { EventRecord } from '../data/eventsApi'
+import { useAuth } from '../auth/useAuth'
+import { Link } from 'react-router-dom'
 
 type TemplateName = NonNullable<EventRecord['inviteTemplate']>
 type InviteRecord = {
@@ -21,6 +23,8 @@ const templates: { id: TemplateName; title: string; detail: string }[] = [
 ]
 
 function InvitePanel({ event, token, onChanged }: InvitePanelProps) {
+  const { user } = useAuth()
+  const isPro = user?.plan === 'pro'
   const [view, setView] = useState<'list' | 'edit'>('list')
   const [query, setQuery] = useState('')
   const [email, setEmail] = useState('')
@@ -59,6 +63,8 @@ function InvitePanel({ event, token, onChanged }: InvitePanelProps) {
     const term = query.trim().toLowerCase()
     return invites.filter((invite) => `${invite.inviteEmail} ${invite.status}`.toLowerCase().includes(term))
   }, [invites, query])
+  const inviteCount = invites.filter((invite) => invite.status !== 'cancelled').length
+  const inviteLimitReached = !isPro && inviteCount >= 5
 
   async function saveDesign() {
     setError('')
@@ -130,6 +136,7 @@ function InvitePanel({ event, token, onChanged }: InvitePanelProps) {
       </div>
       {error && <p className="invite-error" role="alert">{error}</p>}
       {statusMessage && <p className="invite-saved" role="status">{statusMessage}</p>}
+      <p className="workspace-plan-note">{isPro ? 'Pro includes unlimited event invitations.' : <>Free includes up to 5 invitations per event ({Math.min(inviteCount, 5)}/5 used). <Link to="/plans">Upgrade to Pro for unlimited invitations ↗</Link></>}</p>
       {view === 'list' ? (
         <div className="invite-list-view">
           <label className="invite-search"><span aria-hidden="true">⌕</span><input aria-label="Search invitations" onChange={(input) => setQuery(input.target.value)} placeholder="Search by email or status" type="search" value={query} /></label>
@@ -149,10 +156,10 @@ function InvitePanel({ event, token, onChanged }: InvitePanelProps) {
           <form className="invitation-form" onSubmit={sendInvite}>
             <label className="event-form-field">Invitee email<input type="email" onChange={(input) => setEmail(input.target.value)} required value={email} /></label>
             <fieldset className="invite-template-options"><legend>Choose a design</legend>
-              {templates.map((choice) => <button aria-pressed={template === choice.id} className={`invite-template-choice ${template === choice.id ? 'selected' : ''}`} key={choice.id} onClick={() => setTemplate(choice.id)} type="button"><span className={`invite-template-swatch ${choice.id}`} aria-hidden="true"><i /><b /><em /></span><strong>{choice.title}</strong><span>{choice.detail}</span></button>)}
+              {templates.map((choice) => { const locked = !isPro && choice.id !== 'minimal'; return <button aria-pressed={template === choice.id} disabled={locked} className={`invite-template-choice ${template === choice.id ? 'selected' : ''}${locked ? ' locked' : ''}`} key={choice.id} onClick={() => setTemplate(choice.id)} type="button"><span className={`invite-template-swatch ${choice.id}`} aria-hidden="true"><i /><b /><em /></span><strong>{choice.title}{locked ? ' 🔒' : ''}</strong><span>{locked ? 'Pro template · Upgrade to unlock' : choice.detail}</span></button> })}
             </fieldset>
             <label className="event-form-field">Personal message<textarea maxLength={1000} onChange={(input) => setMessage(input.target.value)} value={message} /></label>
-            <div className="invite-editor-actions"><button className="workspace-resend" disabled={busy} onClick={saveDesign} type="button">Save design</button><button className="event-form-submit" disabled={busy} type="submit">{busy ? 'Sending…' : 'Send invitation'}</button></div>
+            <div className="invite-editor-actions"><button className="workspace-resend" disabled={busy} onClick={saveDesign} type="button">Save design</button><button className="event-form-submit" disabled={busy || inviteLimitReached} type="submit">{busy ? 'Sending…' : inviteLimitReached ? 'Invitation limit reached' : 'Send invitation'}</button></div>
           </form>
           <div className="invite-preview"><span className="section-eyebrow">Live email preview</span><iframe title="Invitation email preview" sandbox="" srcDoc={preview} /></div>
         </div>

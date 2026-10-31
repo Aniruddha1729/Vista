@@ -31,12 +31,14 @@ Set these values in the Render service environment. Render supplies `PORT` autom
 | `BREVO_SENDER_NAME` | `Vista Events` or your chosen sender name |
 | `REPORT_ISSUE_TO_EMAIL` | Issue report recipient address |
 | `GEMINI_API_KEY` | Gemini API key used by Vee |
-| `GEMINI_MODEL` | Model enabled for your Gemini key; defaults to `gemini-3.8-flash` |
+| `GEMINI_MODEL` | Primary Gemini model; defaults to `gemini-3.5-flash-lite` |
+| `GEMINI_FALLBACK_MODEL` | Fallback Gemini model; defaults to `gemini-3.8-flash` |
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret |
 | `RAZORPAY_KEY_ID` | Razorpay **test** key ID beginning with `rzp_test_` |
 | `RAZORPAY_KEY_SECRET` | Matching Razorpay test key secret |
+| `RAZORPAY_PRO_PLAN_ID` | Razorpay plan ID for Vista Pro at ₹500 INR every month |
 | `RAZORPAY_WEBHOOK_SECRET` | A strong webhook secret you choose in Razorpay and enter here |
 | `PLATFORM_FEE_BPS` | `300` (3%) |
 | `PORT` | Leave to Render |
@@ -69,7 +71,7 @@ In the Razorpay Dashboard, switch to **Test Mode**, open Webhooks, and add this 
 
 `https://<your-render-service>.onrender.com/api/webhooks/razorpay`
 
-Choose the payment and refund events Vista handles, including `payment.captured`, `refund.created`, `refund.processed`, and `refund.failed`. Do not enable live mode, Route, transfers, or payout integration. Set the same webhook secret in Render as `RAZORPAY_WEBHOOK_SECRET`. The server verifies the signature against the raw request bytes; repeated event deliveries are safe because ledger entries are unique by Razorpay ID and entry type.
+In Razorpay Test Mode, create a monthly plan for ₹500 INR and set its ID as `RAZORPAY_PRO_PLAN_ID`. Choose the payment and refund events Vista handles, including `payment.captured`, `refund.created`, `refund.processed`, and `refund.failed`, plus `subscription.activated`, `subscription.charged`, `subscription.resumed`, `subscription.cancelled`, `subscription.halted`, and `subscription.completed`. Do not enable live mode, Route, transfers, or payout integration. Set the same webhook secret in Render as `RAZORPAY_WEBHOOK_SECRET`. The server verifies the signature against the raw request bytes; recurring plan access changes only from a verified checkout callback or a signed subscription webhook.
 
 ## 6. Smoke checks
 

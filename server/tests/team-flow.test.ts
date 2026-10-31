@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import mongoose from 'mongoose'
 import type { Request, Response } from 'express'
-import { myTeamInvitations } from '../src/controllers/event.controller.js'
+import { myTeamInvitations, sendTeamRegistrationEmails } from '../src/controllers/event.controller.js'
 import { acceptTeamById } from '../src/controllers/team-registration.controller.js'
 import { Event } from '../src/models/event.model.js'
 import { Registration } from '../src/models/registration.model.js'
@@ -124,4 +124,15 @@ test('last teammate acceptance confirms a team and creates a registration for ea
     if (originalBrevoSender === undefined) delete process.env.BREVO_SENDER_EMAIL
     else process.env.BREVO_SENDER_EMAIL = originalBrevoSender
   }
+})
+
+test('team registration sends one acceptance email to each teammate', async () => {
+  const sends: { email: string; index: number; acceptUrl: string }[] = []
+  const result = await sendTeamRegistrationEmails(['lee@example.test', 'sam@example.test'], {
+    eventTitle: 'Campus Hack Day', teamName: 'Green Sparks', leaderName: 'Ari', expiresAt: new Date(Date.now() + 60_000),
+  }, (index) => `https://vista.example.test/team-invites/token-${index}`, async (details) => { sends.push({ email: details.email, index: sends.length, acceptUrl: details.acceptUrl }) })
+  assert.equal(result.every((entry) => entry.status === 'fulfilled'), true)
+  assert.equal(sends.length, 2)
+  assert.deepEqual(new Set(sends.map((send) => send.email)), new Set(['lee@example.test', 'sam@example.test']))
+  assert.ok(sends.every((send) => send.acceptUrl.startsWith('https://vista.example.test/team-invites/')))
 })

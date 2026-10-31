@@ -27,7 +27,7 @@ export async function acceptTeamRequest(request: Request, response: Response) {
   const tokenHash = createHash('sha256').update(String(request.params.token || '')).digest('hex')
   const team = await TeamRegistration.findOne({ 'members.tokenHash': tokenHash })
   if (!team) return response.status(404).json({ message: 'This team request is invalid or has expired.' })
-  if (team.status === 'confirmed') return response.json({ status: 'confirmed', message: 'Your team registration is confirmed. Your ticket is available under My events.' })
+  if (team.status === 'confirmed') return response.json({ status: 'confirmed', message: 'Your team registration is confirmed. Your ticket is available under Registered events.' })
   if (team.status !== 'pending' || team.expiresAt <= new Date()) {
     if (team.status === 'pending') {
       team.status = 'expired'
@@ -93,7 +93,7 @@ async function acceptTeamMember(team: TeamRegistrationDocument, member: TeamRegi
   )
   if (!completingTeam) {
     const latest = await TeamRegistration.findById(team._id)
-    if (latest?.status === 'confirmed') return response.json({ status: 'confirmed', message: 'Your team registration is confirmed. Your ticket is available under My events.' })
+    if (latest?.status === 'confirmed') return response.json({ status: 'confirmed', message: 'Your team registration is confirmed. Your ticket is available under Registered events.' })
     return response.status(409).json({ message: 'Your acceptance is saved. The team is being confirmed; refresh this page in a moment.' })
   }
 
@@ -147,5 +147,5 @@ async function acceptTeamMember(team: TeamRegistrationDocument, member: TeamRegi
     throw error
   }
 
-  response.json({ status: 'confirmed', message: 'Your team is registered. Your ticket is available under My events.' })
+  response.json({ status: 'confirmed', message: 'Your team is registered. Your ticket is available under Registered events.' })
 }

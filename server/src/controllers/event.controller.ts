@@ -10,6 +10,7 @@ import { User } from '../models/user.model.js'
 import { eventHasRoomFilter } from '../utils/capacity.js'
 import { verifyQrToken } from '../utils/qr-token.js'
 import { sendRegistrationConfirmation, sendTeamRegistrationRequest } from '../services/email.js'
+import { hasProTier } from '../utils/user-plan.js'
 
 const eventInput = z.object({
   title: z.string().trim().min(3).max(120),
@@ -51,6 +52,14 @@ export async function listEvents(request: Request, response: Response) {
   response.json({ events })
 }
 
+export async function myHostedEvents(request: Request, response: Response) {
+  const events = await Event.find({ $or: [{ host: request.auth.sub }, { coHosts: request.auth.sub }] })
+    .populate('host', 'name username')
+    .sort({ startDate: 1 })
+    .lean()
+  response.json({ events })
+}
+
 export async function eventDiscovery(_request: Request, response: Response) {
   const [categories, publishedEvents, registeredPlaces] = await Promise.all([
     Event.distinct('category', { status: 'published' }),
@@ -66,8 +75,9 @@ export async function getEvent(request: Request, response: Response) {
   const lookup = /^[a-f\d]{24}$/i.test(eventKey)
     ? { _id: eventKey, status: 'published' }
     : { slug: eventKey, status: 'published' }
-  const event = await Event.findOne(lookup).populate('host', 'name username').lean()
+  const event = await Event.findOne(lookup).populate('host', 'name username plan proExpiresAt').lean()
   if (!event) return response.status(404).json({ message: 'This event could not be found.' })
+  if (!hasProTier(event.host as { plan?: 'free' | 'pro'; proExpiresAt?: Date | null } | null)) event.registrationTemplate = 'vista'
   response.json({ event })
 }
 
@@ -115,7 +125,15 @@ export async function addCoHost(request: Request, response: Response) {
   const coHost = await User.findOne({ email: parsed.data.email.toLowerCase() }).select('_id name username email')
   if (!coHost) return response.status(404).json({ message: 'No Vista account found for that email.' })
   if (coHost.id === request.auth.sub) return response.status(400).json({ message: 'The event host already has full access.' })
-  await Event.updateOne({ _id: request.event.id }, { $addToSet: { coHosts: coHost.id } })
+  const actor = await User.findById(request.auth.sub).select('plan proExpiresAt')
+  const filter = hasProTier(actor)
+    ? { _id: request.event.id }
+    : { _id: request.event.id, coHosts: { $ne: coHost.id }, $expr: { $lt: [{ $size: '$coHosts' }, 5] } }
+  const updated = await Event.updateOne(filter, { $addToSet: { coHosts: coHost.id } })
+  if (!updated.matchedCount) {
+    const alreadyStaff = await Event.exists({ _id: request.event.id, coHosts: coHost.id })
+    if (!alreadyStaff) return response.status(403).json({ code: 'pro_required', message: 'Free plan includes up to 5 event staff members. Upgrade to Pro for unlimited permissions.' })
+  }
   response.status(201).json({ staff: coHost })
 }
 
@@ -129,6 +147,10 @@ export async function createEvent(request: Request, response: Response) {
   if (!parsed.success) return response.status(400).json({ message: 'Check the event details and try again.', errors: parsed.error.flatten() })
   if (parsed.data.priceAmountPaise > 0 && parsed.data.priceUnit === 'team') return response.status(400).json({ message: 'Paid team fees are not enabled yet. Choose an individual fee for now.' })
   if (parsed.data.minTeamSize > parsed.data.maxTeamSize) return response.status(400).json({ message: 'Minimum team size cannot exceed maximum team size.' })
+  if (parsed.data.registrationTemplate !== 'vista' || parsed.data.inviteTemplate !== 'minimal') {
+    const actor = await User.findById(request.auth.sub).select('plan proExpiresAt')
+    if (!hasProTier(actor)) return response.status(403).json({ code: 'pro_required', message: 'Premium event and invitation styles are available with Pro. Upgrade to create an event with those designs.' })
+  }
   const event = await Event.create({ ...parsed.data, slug: makeSlug(parsed.data.title), shareToken: randomUUID(), host: request.auth.sub })
   await event.populate('host', 'name username')
   response.status(201).json({ event })
@@ -139,6 +161,14 @@ export async function updateEvent(request: Request, response: Response) {
   if (!parsed.success) return response.status(400).json({ message: 'Check the event details and try again.', errors: parsed.error.flatten() })
   if (parsed.data.priceAmountPaise !== undefined && parsed.data.priceAmountPaise > 0 && parsed.data.priceUnit === 'team') return response.status(400).json({ message: 'Paid team fees are not enabled yet. Choose an individual fee for now.' })
   if (parsed.data.minTeamSize !== undefined && parsed.data.maxTeamSize !== undefined && parsed.data.minTeamSize > parsed.data.maxTeamSize) return response.status(400).json({ message: 'Minimum team size cannot exceed maximum team size.' })
+  if (parsed.data.registrationTemplate && parsed.data.registrationTemplate !== 'vista') {
+    const actor = await User.findById(request.auth.sub).select('plan proExpiresAt')
+    if (!hasProTier(actor)) return response.status(403).json({ code: 'pro_required', message: 'Registration page styles are a Pro feature. Upgrade to Pro to unlock them.' })
+  }
+  if (parsed.data.inviteTemplate && parsed.data.inviteTemplate !== 'minimal') {
+    const actor = await User.findById(request.auth.sub).select('plan proExpiresAt')
+    if (!hasProTier(actor)) return response.status(403).json({ code: 'pro_required', message: 'This invitation template is locked on the Free plan. Upgrade to Pro to unlock premium designs.' })
+  }
   if (Object.keys(parsed.data).length === 0) return response.status(400).json({ message: 'Send at least one event detail to update.' })
   const event = await Event.findByIdAndUpdate(request.params.id, parsed.data, { new: true, runValidators: true }).populate('host', 'name username')
   response.json({ event })
@@ -200,20 +230,22 @@ export async function createTeamRegistration(request: Request, response: Respons
   })
 
   const clientUrl = (process.env.CLIENT_URL || '').split(',')[0].trim().replace(/\/$/, '')
-  const sends = await Promise.allSettled(emails.map((email, index) => sendTeamRegistrationRequest({
-    email,
+  const sends = await sendTeamRegistrationEmails(emails, {
     eventTitle: event.title,
     teamName: team.teamName,
     leaderName: leader.name,
-    acceptUrl: `${clientUrl}/team-invites/${rawTokens[index]}`,
     expiresAt,
-  })))
+  }, (index) => `${clientUrl}/team-invites/${rawTokens[index]}`)
   const failed = sends.filter((result) => result.status === 'rejected').length
   response.status(201).json({
     teamRegistration: { id: team.id, teamName: team.teamName, teamSize: team.teamSize, status: team.status, expiresAt, members: team.members.map((member) => ({ email: member.email, status: member.status })) },
     emailSent: failed === 0,
     message: failed ? 'Your team request was saved, but some invitation emails could not be sent. Check Brevo settings before retrying.' : 'Team request sent. Your teammates need to accept within 48 hours.',
   })
+}
+
+export async function sendTeamRegistrationEmails(emails: string[], details: { eventTitle: string; teamName: string; leaderName: string; expiresAt: Date }, acceptUrlFor: (index: number) => string, sender: (details: { email: string; eventTitle: string; teamName: string; leaderName: string; acceptUrl: string; expiresAt: Date }) => Promise<unknown> = sendTeamRegistrationRequest) {
+  return Promise.allSettled(emails.map((email, index) => sender({ ...details, email, acceptUrl: acceptUrlFor(index) })))
 }
 
 export async function registerForEvent(request: Request, response: Response) {

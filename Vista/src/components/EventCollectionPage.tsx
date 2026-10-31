@@ -14,6 +14,7 @@ type EventCollectionPageProps = {
   loading?: boolean
   error?: string
   showTickets?: boolean
+  showManageLinks?: boolean
   actionLabel?: string
   actionHref?: string
   onRemoveSaved?: (eventId: string) => void
@@ -28,6 +29,7 @@ function EventCollectionPage({
   loading = false,
   error = '',
   showTickets = false,
+  showManageLinks = false,
   actionLabel,
   actionHref,
   onRemoveSaved,
@@ -60,7 +62,7 @@ function EventCollectionPage({
             </div>
             {loading ? <p>Loading your events…</p> : error ? <p role="alert">{error}</p> : events.length ? (
               <section className="collection-grid" aria-label="Campus events">
-                {events.slice(0, visibleCount).map((event) => <div className="collection-event-card" key={event.id}><Card {...event} />{onRemoveSaved && <button className="collection-remove-saved" disabled={removingSavedId === event.id} onClick={() => onRemoveSaved(event.id)} type="button">{removingSavedId === event.id ? 'Removing…' : 'Remove from saved'}</button>}{showTickets && event.registrationId && <Link className="collection-ticket-link" to={`/tickets/${event.registrationId}`}>Open entry ticket ↗</Link>}</div>)}
+                {events.slice(0, visibleCount).map((event) => <div className="collection-event-card" key={event.id}><Card {...event} />{onRemoveSaved && <button className="collection-remove-saved" disabled={removingSavedId === event.id} onClick={() => onRemoveSaved(event.id)} type="button">{removingSavedId === event.id ? 'Removing…' : 'Remove from saved'}</button>}{showTickets && event.registrationId && <Link className="collection-ticket-link" to={`/tickets/${event.registrationId}`}>View entry QR code ↗</Link>}{showManageLinks && <Link className="collection-ticket-link" to={`/host-event?id=${encodeURIComponent(event.id)}`}>Manage event ↗</Link>}</div>)}
               </section>
             ) : <p>No events to show yet.</p>}
             {!loading && !error && events.length > visibleCount && <button className="events-show-more" onClick={() => setVisibleCount((count) => count + 9)} type="button">Show more events <span>↓</span></button>}

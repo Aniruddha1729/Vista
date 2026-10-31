@@ -10,7 +10,8 @@ const exploreLinks = [
 ]
 
 const organiseLinks = [
-  { icon: '◷', label: 'My events', href: '/my-events' },
+  { icon: '◷', label: 'Registered events', href: '/registered-events' },
+  { icon: '✦', label: 'My events', href: '/my-events' },
   { icon: '•', label: 'Notifications', href: '/notifications' },
   { icon: '+', label: 'Host an event', href: '/host-event' },
 ]
@@ -44,7 +45,8 @@ export function SidebarUnfoldableExample() {
     { icon: '⌂', label: 'Home', href: '/' },
     { icon: '⌕', label: 'Discover events', href: '/events' },
     { icon: '♡', label: 'Saved events', href: '/saved-events' },
-    { icon: '◷', label: 'My events', href: '/my-events' },
+    { icon: '◷', label: 'Registered events', href: '/registered-events' },
+    { icon: '✦', label: 'My events', href: '/my-events' },
     { icon: '•', label: 'Notifications', href: '/notifications' },
     { icon: '+', label: 'Host an event', href: '/host-event' },
     { icon: '⚙', label: 'Settings', href: '/settings' },

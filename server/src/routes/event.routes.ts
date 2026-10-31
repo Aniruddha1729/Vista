@@ -1,20 +1,24 @@
 import { Router } from 'express'
-import { addCoHost, applicants, cancelRegistration, createEvent, createTeamRegistration, deleteEvent, eventDiscovery, getEvent, getEventPreview, getManageEvent, getShareQr, listEvents, myRegistrations, myTeamInvitations, registerForEvent, regenerateShareToken, removeCoHost, resolveShareLink, saveEvent, savedEvents, scanRegistration, unsaveEvent, updateEvent } from '../controllers/event.controller.js'
+import { addCoHost, applicants, cancelRegistration, createEvent, createTeamRegistration, deleteEvent, eventDiscovery, getEvent, getEventPreview, getManageEvent, getShareQr, listEvents, myHostedEvents, myRegistrations, myTeamInvitations, registerForEvent, regenerateShareToken, removeCoHost, resolveShareLink, saveEvent, savedEvents, scanRegistration, unsaveEvent, updateEvent } from '../controllers/event.controller.js'
 import { acceptTeamById, acceptTeamRequest, getTeamInvitation } from '../controllers/team-registration.controller.js'
 import { requireAuth } from '../middleware/require-auth.js'
 import { requireEventHost } from '../middleware/require-event-host.js'
 import { requireEventOwner } from '../middleware/require-event-owner.js'
 import { rateLimit } from 'express-rate-limit'
 import { createInvite, deleteInvite, invitePreview, listInvites, resendInvite } from '../controllers/invite.controller.js'
-import { createEventOrder, verifyEventPayment } from '../controllers/payment.controller.js'
+import { createEventOrder, createProSubscription, verifyEventPayment, verifyProSubscription } from '../controllers/payment.controller.js'
 import { getEventFinance, requestEventWithdrawal } from '../controllers/organiser-finance.controller.js'
 
 const router = Router()
 const inviteLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 10, message: { message: 'Too many invitation requests. Try again later.' } })
 
+router.post('/billing/pro/subscription', requireAuth, createProSubscription)
+router.post('/billing/pro/verify', requireAuth, verifyProSubscription)
+
 router.get('/', listEvents)
 router.get('/discovery', eventDiscovery)
 router.get('/mine/registrations', requireAuth, myRegistrations)
+router.get('/mine/hosted', requireAuth, myHostedEvents)
 router.get('/mine/team-invitations', requireAuth, myTeamInvitations)
 router.get('/mine/saved', requireAuth, savedEvents)
 router.get('/share/:token', resolveShareLink)

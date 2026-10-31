@@ -1,10 +1,15 @@
 import { useState } from 'react'
 import { eventsRequest } from '../data/eventsApi'
 import type { EventRecord } from '../data/eventsApi'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../auth/useAuth'
 
 type PermissionsPanelProps = { event: EventRecord; token: string; onChanged: (event: EventRecord) => void; isOwner: boolean }
 
 function PermissionsPanel({ event, token, onChanged, isOwner }: PermissionsPanelProps) {
+  const { user } = useAuth()
+  const isPro = user?.plan === 'pro'
+  const staffLimitReached = !isPro && (event.coHosts?.length || 0) >= 5
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -41,7 +46,8 @@ function PermissionsPanel({ event, token, onChanged, isOwner }: PermissionsPanel
   return (
     <section className="workspace-panel">
       <div className="workspace-panel-heading"><div><span className="section-eyebrow">Event team</span><h2>Set event staff.</h2></div><span className="workspace-panel-count">{event.coHosts?.length || 0} staff members</span></div>
-      {isOwner && <form className="permissions-add-form" onSubmit={addStaff}><label className="workspace-search"><span aria-hidden="true">⌕</span><input aria-label="Staff email" onChange={(input) => setEmail(input.target.value)} placeholder="Add a Vista account by email" required type="email" value={email} /></label><button className="workspace-resend" disabled={saving} type="submit">{saving ? 'Adding…' : 'Add staff'}</button></form>}
+      <p className="workspace-plan-note">{isPro ? 'Pro includes unlimited event permissions.' : <>Free includes up to 5 staff members per event ({Math.min(event.coHosts?.length || 0, 5)}/5 used). <Link to="/plans">Upgrade to Pro for unlimited permissions ↗</Link></>}</p>
+      {isOwner && <form className="permissions-add-form" onSubmit={addStaff}><label className="workspace-search"><span aria-hidden="true">⌕</span><input aria-label="Staff email" onChange={(input) => setEmail(input.target.value)} placeholder="Add a Vista account by email" required type="email" value={email} /></label><button className="workspace-resend" disabled={saving || staffLimitReached} type="submit">{saving ? 'Adding…' : staffLimitReached ? 'Limit reached' : 'Add staff'}</button></form>}
       {error && <p role="alert">{error}</p>}
       <div className="workspace-table" role="table" aria-label="Event staff">
         <div className="workspace-table-row workspace-table-header" role="row"><span>Username</span><span>Email</span><span>Access</span></div>

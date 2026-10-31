@@ -16,10 +16,11 @@ function LoggedInHeader() {
   const pendingInvitations = usePendingInvitationCount()
   const signedInNavigation = [
     { label: 'Events', href: '/events' },
-    { label: 'Registered', href: '/my-events' },
+    { label: 'Registered', href: '/registered-events' },
+    { label: 'My events', href: '/my-events' },
     { label: 'Notifications', href: '/notifications', icon: pendingInvitations > 0 ? <span className="notification-dot" aria-label={`${pendingInvitations} pending invitation${pendingInvitations === 1 ? '' : 's'}`} /> : undefined },
   ]
-  const activeIndex = location.pathname === '/' || location.pathname === '/saved-events' ? -1 : location.pathname === '/my-events' ? 1 : location.pathname === '/notifications' ? 2 : 0
+  const activeIndex = location.pathname === '/' || location.pathname === '/saved-events' ? -1 : location.pathname === '/registered-events' ? 1 : location.pathname === '/my-events' ? 2 : location.pathname === '/notifications' ? 3 : 0
 
   async function handleLogout() {
     await logout()

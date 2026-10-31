@@ -4,6 +4,7 @@ const Home = lazy(() => import("./pages/Home"));
 const EventsPage = lazy(() => import("./pages/EventsPage"));
 const SavedEventsPage = lazy(() => import("./pages/SavedEventsPage"));
 const MyEventsPage = lazy(() => import("./pages/MyEventsPage"));
+const RegisteredEventsPage = lazy(() => import("./pages/RegisteredEventsPage"));
 const HostEventPage = lazy(() => import("./pages/HostEventPage"));
 const EventPublicViewPage = lazy(() => import("./pages/EventPublicViewPage"));
 const EventRegistrationPage = lazy(() => import("./pages/EventRegistrationPage"));
@@ -75,6 +76,7 @@ function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route path="/saved-events" element={<SavedEventsPage />} />
           <Route path="/my-events" element={<MyEventsPage />} />
+          <Route path="/registered-events" element={<RegisteredEventsPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/plans" element={<PlansPage />} />
           <Route path="/host-event" element={<HostEventPage />} />

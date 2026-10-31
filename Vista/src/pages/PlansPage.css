@@ -42,5 +42,7 @@
 .plan-action-pro { background: #c8f246; color: #14200a; }
 .plan-action-pro:disabled { cursor: not-allowed; opacity: .76; }
 .plans-note { color: var(--vista-muted, #71756b); font-size: 11px; line-height: 1.6; margin: 22px auto 0; max-width: 710px; text-align: center; }
+.plans-checkout-error { background: #fff0ec; border-radius: 9px; color: #9b321b; padding: 12px 15px; }
+.plans-checkout-message { background: #e9f7bd; border-radius: 9px; color: #405c10; padding: 12px 15px; }
 @media (max-width: 720px) { .plans-sidebar { flex-basis: 48px; } .plans-page { padding: 50px 16px 70px; } .plans-grid { grid-template-columns: 1fr; } .pixel-card.plan-pixel-card { min-height: 510px; } .plan-card-content { min-height: 450px; } }
 @media (prefers-reduced-motion: reduce) { .plans-page *, .plans-page *::before, .plans-page *::after { scroll-behavior: auto !important; } }

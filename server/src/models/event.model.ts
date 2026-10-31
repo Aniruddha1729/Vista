@@ -13,6 +13,7 @@ const eventSchema = new mongoose.Schema({
   mode: { type: String, enum: ['In person', 'Online', 'Hybrid'], default: 'In person' },
   capacity: { type: Number, min: 1, default: 100 },
   registeredCount: { type: Number, min: 0, default: 0 },
+  inviteCount: { type: Number, min: 0, default: 0 },
   price: { type: String, default: 'Free' },
   priceAmountPaise: { type: Number, min: 0, default: 0, validate: Number.isSafeInteger },
   priceUnit: { type: String, enum: ['individual', 'team'], default: 'individual' },

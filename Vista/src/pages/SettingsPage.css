@@ -19,6 +19,9 @@
 .sidebar-preview-hover i:first-child { background: #c8f246; color: #111; }
 .sidebar-preview-dock i:hover { transform: scale(1.22); }
 .theme-setting-card { align-items: center; display: flex; justify-content: space-between; }
+.upgrade-plan-card { align-items: center; display: flex; gap: 24px; justify-content: space-between; }
+.upgrade-plan-card > div { max-width: 650px; }
+.upgrade-plan-card .settings-submit { flex: 0 0 auto; margin: 0; text-decoration: none; }
 .settings-secondary-button { background: transparent; border: 1px solid rgba(12,13,11,.2); border-radius: 9px; cursor: pointer; font: inherit; font-size: 12px; padding: 12px 15px; }
 .issue-report-form { display: grid; gap: 16px; margin-top: 20px; max-width: 680px; }
 .issue-report-form label { display: grid; font-size: 12px; gap: 7px; }
@@ -26,4 +29,4 @@
 .issue-report-form textarea { resize: vertical; }
 .settings-submit { justify-self: start; margin-top: 2px; }
 @media (max-width: 800px) { .settings-sidebar { display: none; } }
-@media (max-width: 600px) { .settings-main { padding: 36px 16px 70px; } .sidebar-style-options { grid-template-columns: 1fr; } .settings-card-heading, .theme-setting-card { align-items: flex-start; flex-direction: column; gap: 18px; } }
+@media (max-width: 600px) { .settings-main { padding: 36px 16px 70px; } .sidebar-style-options { grid-template-columns: 1fr; } .settings-card-heading, .theme-setting-card, .upgrade-plan-card { align-items: flex-start; flex-direction: column; gap: 18px; } }

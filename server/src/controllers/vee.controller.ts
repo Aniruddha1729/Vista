@@ -20,7 +20,7 @@ const requestSchema = z.object({
   }
 })
 
-const knownPages = new Set(['/','/events','/saved-events','/my-events','/notifications','/profile','/plans','/host-event','/login','/signup','/verify-email'])
+const knownPages = new Set(['/','/events','/saved-events','/my-events','/registered-events','/notifications','/profile','/plans','/host-event','/login','/signup','/verify-email'])
 function safePage(value?: string) {
   if (!value) return 'unknown'
   const path = value.split(/[?#]/, 1)[0]
@@ -34,41 +34,68 @@ export async function chatWithVee(request: Request, response: Response) {
   const parsed = requestSchema.safeParse(request.body)
   if (!parsed.success) return response.status(400).json({ message: 'Enter a message up to 2,000 characters. Recent chat history must be under 6,000 characters.' })
   const apiKey = process.env.GEMINI_API_KEY
-  if (!apiKey) return response.status(503).json({ message: 'Vee AI is not configured yet. Add GEMINI_API_KEY to the server environment.' })
-
-  let result: Awaited<ReturnType<typeof fetch>>
-  try {
-    const model = process.env.GEMINI_MODEL || 'gemini-3.8-flash'
-    result = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-      method: 'POST',
-      headers: { 'x-goog-api-key': apiKey, 'Content-Type': 'application/json' },
-      signal: AbortSignal.timeout(30_000),
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: `${projectContext}\n\nCurrent Vista page (untrusted hint; do not infer user data from it): ${safePage(parsed.data.page)}.` }] },
-        contents: [
-          ...parsed.data.history.map((item) => ({ role: item.role === 'assistant' ? 'model' : 'user', parts: [{ text: item.content }] })),
-          { role: 'user', parts: [{ text: parsed.data.message }] },
-        ],
-        generationConfig: { maxOutputTokens: 600 },
-      }),
-    })
-  } catch (error) {
-    console.error('Gemini request could not be reached:', error instanceof Error ? error.message : 'Unknown network error.')
-    return response.status(502).json({ message: 'Vee could not reach its AI service. Try again shortly.' })
+  const primaryModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite'
+  const fallbackModel = process.env.GEMINI_FALLBACK_MODEL || 'gemini-3.8-flash'
+  if (!apiKey) {
+    console.error('Gemini request failed', { status: 503, model: primaryModel, elapsedMs: 0 })
+    return response.status(503).json({ message: 'Vee is busy, please try again in a moment.' })
   }
 
-  const payload = await result.json().catch(() => ({})) as {
+  const models = primaryModel === fallbackModel ? [primaryModel] : [primaryModel, fallbackModel]
+  const requestBody = JSON.stringify({
+    systemInstruction: { parts: [{ text: `${projectContext}\n\nCurrent Vista page (untrusted hint; do not infer user data from it): ${safePage(parsed.data.page)}.` }] },
+    contents: [
+      ...parsed.data.history.map((item) => ({ role: item.role === 'assistant' ? 'model' : 'user', parts: [{ text: item.content }] })),
+      { role: 'user', parts: [{ text: parsed.data.message }] },
+    ],
+    generationConfig: { maxOutputTokens: 600 },
+  })
+  type GeminiPayload = {
     candidates?: { content?: { parts?: { text?: string }[] } }[]
     error?: { message?: string; status?: string; code?: number }
   }
-  if (!result.ok) {
-    console.error(`Gemini request failed (${result.status}${payload.error?.status ? ` ${payload.error.status}` : ''}): ${payload.error?.message || 'No provider error detail returned.'}`)
-    if (result.status === 401 || result.status === 403) return response.status(502).json({ message: 'Gemini rejected the API key. Check GEMINI_API_KEY and its Gemini API access.' })
-    if (result.status === 404) return response.status(502).json({ message: 'Gemini could not find the configured model. Check GEMINI_MODEL.' })
-    if (result.status === 429) return response.status(502).json({ message: 'Gemini rate limit or API quota reached. Check your Google AI Studio project usage and limits.' })
-    return response.status(502).json({ message: 'Gemini rejected the request. Check the Vista API logs and verify the model and API project access.' })
+  const retryDelaysMs = [1_000, 3_000]
+  const retryableStatuses = new Set([429, 503])
+  let lastStatus: number | string = 'NO_RESPONSE'
+  for (const [modelIndex, model] of models.entries()) {
+    const maxAttempts = modelIndex === 0 ? 3 : 1
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      const startedAt = Date.now()
+      try {
+        const result = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+          method: 'POST',
+          headers: { 'x-goog-api-key': apiKey, 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(30_000),
+          body: requestBody,
+        })
+        const elapsedMs = Date.now() - startedAt
+        lastStatus = result.status
+        const payload = await result.json().catch(() => ({})) as GeminiPayload
+        if (result.ok) {
+          const text = payload.candidates?.flatMap((candidate) => candidate.content?.parts || []).map((part) => part.text || '').join('').trim()
+          if (text) return response.json({ reply: text })
+          lastStatus = 'EMPTY_RESPONSE'
+          console.error('Gemini request failed', { status: lastStatus, model, elapsedMs })
+          break
+        }
+
+        console.error('Gemini request failed', { status: result.status, model, elapsedMs })
+        if (!retryableStatuses.has(result.status)) break
+      } catch (error) {
+        const elapsedMs = Date.now() - startedAt
+        const timedOut = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')
+        lastStatus = timedOut ? 'TIMEOUT' : 'NETWORK_ERROR'
+        console.error('Gemini request failed', { status: lastStatus, model, elapsedMs })
+        if (!timedOut) break
+      }
+
+      if (attempt + 1 < maxAttempts) await new Promise((resolve) => setTimeout(resolve, retryDelaysMs[attempt]))
+    }
+
+    if ([400, 401, 403].includes(Number(lastStatus))) break
+    if (modelIndex === 0 && lastStatus === 404) continue
   }
-  const text = payload.candidates?.flatMap((candidate) => candidate.content?.parts || []).map((part) => part.text || '').join('').trim()
-  if (!text) return response.status(502).json({ message: 'Vee returned an empty response. Please try again.' })
-  response.json({ reply: text })
+
+  // Provider response details and credentials are intentionally kept out of logs and the client message.
+  return response.status(502).json({ message: 'Vee is busy, please try again in a moment.' })
 }

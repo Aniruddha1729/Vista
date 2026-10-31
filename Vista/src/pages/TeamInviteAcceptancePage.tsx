@@ -69,7 +69,7 @@ function TeamInviteAcceptancePage() {
           {user?.email.toLowerCase() !== invitation.invitedEmail.toLowerCase() && <p className="team-invite-error">Sign in using <strong>{invitation.invitedEmail}</strong> to accept this request.</p>}
           {message && <p className="team-invite-message" role="status">{message}</p>}
           {error && <p className="team-invite-error" role="alert">{error}</p>}
-          {invitation.status === 'confirmed' ? <Link className="team-invite-button" to="/my-events">View your ticket ↗</Link> : <button className="team-invite-button" disabled={accepting || invitation.memberStatus === 'accepted' || user?.email.toLowerCase() !== invitation.invitedEmail.toLowerCase()} onClick={() => void accept()} type="button">{accepting ? 'Accepting…' : invitation.memberStatus === 'accepted' ? 'Waiting for teammates' : 'Accept and join team ↗'}</button>}
+          {invitation.status === 'confirmed' ? <Link className="team-invite-button" to="/registered-events">View your ticket ↗</Link> : <button className="team-invite-button" disabled={accepting || invitation.memberStatus === 'accepted' || user?.email.toLowerCase() !== invitation.invitedEmail.toLowerCase()} onClick={() => void accept()} type="button">{accepting ? 'Accepting…' : invitation.memberStatus === 'accepted' ? 'Waiting for teammates' : 'Accept and join team ↗'}</button>}
         </> : null}
         <Link className="team-invite-back" to="/events">Browse events</Link>
       </section>

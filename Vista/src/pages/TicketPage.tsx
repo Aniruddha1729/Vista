@@ -34,7 +34,7 @@ function TicketPage() {
         <p>Show this QR at the event entrance. It contains a signed ticket code and no personal details.</p>
         {error ? <p role="alert">{error}</p> : qrDataUrl ? <img className="ticket-qr" src={qrDataUrl} alt="Signed event entry pass QR code" /> : <p>Loading your ticket…</p>}
         {qrDataUrl && <a className="ticket-download" download="vista-entry-ticket.png" href={qrDataUrl}>Download ticket QR</a>}
-        <Link className="ticket-back" to="/my-events">Back to my events</Link>
+        <Link className="ticket-back" to="/registered-events">Back to registered events</Link>
       </main>
     </div>
   )

@@ -1,11 +1,13 @@
 import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
+import { useTheme } from '../theme/useTheme'
 
 type HeaderProps = { authPage?: 'login' | 'signup' | 'verify' }
 
 function Header({ authPage }: HeaderProps) {
   const { user } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const location = useLocation()
 
   useEffect(() => {
@@ -27,7 +29,8 @@ function Header({ authPage }: HeaderProps) {
       </nav>
 
       <div className="header-actions">
-        {user ? <Link className="sign-in" to="/my-events">My events</Link> : authPage === 'login' ? <Link className="sign-in" to="/signup">Create account</Link> : <Link className="sign-in" to="/login">Sign in</Link>}
+        <button className="header-theme-toggle" type="button" aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} onClick={toggleTheme} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}><span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span><span className="header-theme-label">{theme === 'dark' ? 'Light' : 'Dark'}</span></button>
+        {user ? <Link className="sign-in" to="/registered-events">Registered events</Link> : authPage === 'login' ? <Link className="sign-in" to="/signup">Create account</Link> : <Link className="sign-in" to="/login">Sign in</Link>}
       </div>
     </header>
   )

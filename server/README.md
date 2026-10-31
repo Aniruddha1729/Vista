@@ -14,7 +14,7 @@ Hosts choose registration limits from fixed options in the event editor: individ
 
 Email code lives in `src/services/email.ts`; the four inline-CSS invite designs are in `src/services/invite-template.ts`. Set `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, and `BREVO_SENDER_NAME` in the local `.env` to send messages. The sender address must be enabled in Brevo.
 
-Vee uses Gemini through the server-side `GEMINI_API_KEY` (`GEMINI_MODEL` defaults to `gemini-3.8-flash`). Add your Gemini API key to `server/.env`; it is never sent to the browser. Vee receives a small, validated recent chat history and the current page route, plus Vista feature context and instructions not to claim it performed account actions.
+Vee uses Gemini through the server-side `GEMINI_API_KEY`. `GEMINI_MODEL` defaults to `gemini-3.5-flash-lite` and `GEMINI_FALLBACK_MODEL` defaults to `gemini-3.8-flash`; both model values are configurable through environment variables. Add the Gemini API key to `server/.env`; it is never sent to the browser. Vee receives a small, validated recent chat history and the current page route, plus Vista feature context and instructions not to claim it performed account actions. The primary model retries 429, 503, and timeouts twice with 1s and 3s backoff and a 30-second timeout per attempt. A primary 404 skips directly to one fallback attempt; other primary failures also proceed to one fallback attempt except 400, 401, and 403, which stop immediately.
 
 Profile images are uploaded from memory to Cloudinary using `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`; only the resulting secure image URL is stored in the user record. Render does not need a persistent disk for avatar uploads.
 
